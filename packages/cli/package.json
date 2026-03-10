@@ -1,0 +1,26 @@
+{
+  "name": "@makotot/canopy-cli",
+  "version": "0.0.0",
+  "description": "CLI for Canopy — visualize React render trees as Mermaid flowcharts",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/makotot/canopy.git",
+    "directory": "packages/cli"
+  },
+  "type": "module",
+  "bin": {
+    "canopy": "./dist/cli.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@makotot/canopy-core": "workspace:*",
+    "@makotot/canopy-annotator-async": "workspace:*",
+    "@makotot/canopy-reporter-mermaid": "workspace:*",
+    "cac": "7.0.0"
+  }
+}

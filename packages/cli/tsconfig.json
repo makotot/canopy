@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "paths": {
+      "@makotot/canopy-core": ["../core/src/index.ts"],
+      "@makotot/canopy-annotator-async": ["../annotator-async/src/index.ts"],
+      "@makotot/canopy-reporter-mermaid": ["../reporter-mermaid/src/index.ts"]
+    }
+  },
+  "include": ["src"]
+}
