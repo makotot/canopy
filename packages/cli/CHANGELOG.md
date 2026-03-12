@@ -1,5 +1,11 @@
 # @makotot/canopy-cli
 
+## 0.1.1
+
+### Patch Changes
+
+- 98e1a60: Add sheban to cli
+
 ## 0.1.0
 
 ### Minor Changes
