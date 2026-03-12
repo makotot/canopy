@@ -1,6 +1,6 @@
 {
   "name": "@makotot/canopy-core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Core analyzer and pipeline for Canopy — static React render tree analysis",
   "license": "MIT",
   "repository": {
@@ -15,7 +15,9 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "typecheck": "tsc --noEmit"
