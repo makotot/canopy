@@ -69,7 +69,7 @@ node packages/cli/dist/cli.js <file>
 
 ## Requirements
 
-- Node.js 22+
+- Node.js 24+
 
 ## License
 
