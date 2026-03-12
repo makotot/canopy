@@ -37,7 +37,7 @@ Split each annotator into its own package (`packages/annotator-*/`) from v0.1.
 
 - **Build**: `tsc` only
 - **Module**: ESM only
-- **Node.js**: latest LTS (v22)
+- **Node.js**: latest LTS (v24)
 - **Package manager**: pnpm workspaces
 - **Test**: vitest + coverage (v8)
 - **Lint**: ESLint
