@@ -1,6 +1,6 @@
 {
   "name": "@makotot/canopy-annotator-async",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Canopy annotator — detects async React components",
   "license": "MIT",
   "repository": {
@@ -15,7 +15,9 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "typecheck": "tsc --noEmit"
