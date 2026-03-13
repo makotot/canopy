@@ -1,4 +1,5 @@
 export { analyzeRenderTree } from './analyzer/analyze.js';
+export { createProject } from './create-project.js';
 export type { TreeNode, AnalyzeResult } from './analyzer/analyze.js';
 
 export { compose } from './annotator.js';

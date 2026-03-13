@@ -1,9 +1,15 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
+import { type Project } from 'ts-morph';
 import { analyzeRenderTree } from './analyze.js';
+import { createProject } from '../create-project.js';
 
 const fixture = (name: string) => new URL(`../__fixtures__/${name}`, import.meta.url).pathname;
 
 describe('analyzeRenderTree', () => {
+  let project: Project;
+  beforeAll(() => {
+    project = createProject();
+  });
   describe('root component', () => {
     it.each([
       { fixture: 'simple-page.tsx', expected: 'Page' },
@@ -11,7 +17,7 @@ describe('analyzeRenderTree', () => {
       { fixture: 'page-with-conditional.tsx', expected: 'Page' },
       { fixture: 'page-with-render-prop.tsx', expected: 'Page' },
     ])('$fixture → $expected', ({ fixture: f, expected }) => {
-      const result = analyzeRenderTree(fixture(f));
+      const result = analyzeRenderTree(fixture(f), project);
       expect(result.tree.component).toBe(expected);
     });
   });
@@ -75,7 +81,7 @@ describe('analyzeRenderTree', () => {
         expected: 'li',
       },
     ])('$label', ({ fixture: f, get, expected }) => {
-      const result = analyzeRenderTree(fixture(f));
+      const result = analyzeRenderTree(fixture(f), project);
       expect(get(result.tree)).toBe(expected);
     });
   });

@@ -1,10 +1,16 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
+import { type Project } from 'ts-morph';
+import { createProject } from '@makotot/canopy-core';
 import { run } from './run.js';
 
 const fixture = (name: string) =>
   new URL(`../../core/src/__fixtures__/${name}`, import.meta.url).pathname;
 
 describe('run', () => {
+  let project: Project;
+  beforeAll(() => {
+    project = createProject();
+  });
   it.each([
     {
       label: 'outputs mermaid flowchart header',
@@ -30,7 +36,7 @@ describe('run', () => {
     },
   ])('$label', ({ fixture: f, assert }) => {
     let output = '';
-    run(fixture(f), (s) => { output = s; });
+    run(fixture(f), (s) => { output = s; }, project);
     assert(output);
   });
 
