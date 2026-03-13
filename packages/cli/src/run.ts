@@ -1,22 +1,7 @@
-import {
-  analyzeRenderTree,
-  createPipeline,
-  type Annotator,
-  type Out,
-  type TreeNode,
-} from '@makotot/canopy-core';
-import { createAsyncAnnotator } from '@makotot/canopy-annotator-async';
-import { createClientBoundaryAnnotator } from '@makotot/canopy-annotator-client-boundary';
+import { analyzeRenderTree, createPipeline, type Out } from '@makotot/canopy-core';
 import { createMermaidReporter } from '@makotot/canopy-reporter-mermaid';
 import { type Project } from 'ts-morph';
-
-const ANNOTATORS: Record<
-  string,
-  (sourceFilePath: string, project: Project) => Annotator<TreeNode>
-> = {
-  async: createAsyncAnnotator,
-  'client-boundary': createClientBoundaryAnnotator,
-};
+import { ANNOTATORS } from './annotators.js';
 
 export function run(
   filePath: string,
