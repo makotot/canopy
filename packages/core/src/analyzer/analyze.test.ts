@@ -17,7 +17,25 @@ describe('analyzeRenderTree', () => {
       { fixture: 'page-with-conditional.tsx', expected: 'Page' },
       { fixture: 'page-with-render-prop.tsx', expected: 'Page' },
     ])('$fixture → $expected', ({ fixture: f, expected }) => {
-      const result = analyzeRenderTree(fixture(f), project);
+      const result = analyzeRenderTree({ filePath: fixture(f), project });
+      expect(result.tree.component).toBe(expected);
+    });
+
+    it('auto-detects named export when no default export', () => {
+      const result = analyzeRenderTree({ filePath: fixture('named-export-component.tsx'), project });
+      expect(result.tree.component).toBe('Header');
+    });
+
+    it('uses specified componentName for named export', () => {
+      const result = analyzeRenderTree({ filePath: fixture('named-export-component.tsx'), componentName: 'Header', project });
+      expect(result.tree.component).toBe('Header');
+    });
+
+    it.each([
+      { fixture: 'multiple-named-exports.tsx', componentName: 'Header', expected: 'Header' },
+      { fixture: 'multiple-named-exports.tsx', componentName: 'Footer', expected: 'Footer' },
+    ])('$fixture with componentName=$componentName → $expected', ({ fixture: f, componentName, expected }) => {
+      const result = analyzeRenderTree({ filePath: fixture(f), componentName, project });
       expect(result.tree.component).toBe(expected);
     });
   });
@@ -81,16 +99,28 @@ describe('analyzeRenderTree', () => {
         expected: 'li',
       },
     ])('$label', ({ fixture: f, get, expected }) => {
-      const result = analyzeRenderTree(fixture(f), project);
+      const result = analyzeRenderTree({ filePath: fixture(f), project });
       expect(get(result.tree)).toBe(expected);
     });
   });
 
   describe('error handling', () => {
     it.each([
-      { label: 'non-existent file', path: '/nonexistent/page.tsx', error: 'File not found' },
-    ])('$label', ({ path, error }) => {
-      expect(() => analyzeRenderTree(path)).toThrow(error);
+      { label: 'non-existent file', filePath: '/nonexistent/page.tsx', componentName: undefined, error: 'File not found' },
+      {
+        label: 'multiple named exports without componentName',
+        filePath: fixture('multiple-named-exports.tsx'),
+        componentName: undefined,
+        error: '--component',
+      },
+      {
+        label: 'componentName not found in file',
+        filePath: fixture('named-export-component.tsx'),
+        componentName: 'NonExistent',
+        error: 'No exported function component found',
+      },
+    ])('$label', ({ filePath, componentName, error }) => {
+      expect(() => analyzeRenderTree({ filePath, ...(componentName !== undefined && { componentName }) })).toThrow(error);
     });
   });
 });
