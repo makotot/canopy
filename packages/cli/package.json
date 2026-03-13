@@ -23,6 +23,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@clack/prompts": "^1.1.0",
     "@makotot/canopy-annotator-async": "workspace:*",
     "@makotot/canopy-annotator-client-boundary": "workspace:*",
     "@makotot/canopy-core": "workspace:*",
