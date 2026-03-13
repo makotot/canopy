@@ -1,5 +1,11 @@
 # @makotot/canopy-core
 
+## 0.2.0
+
+### Minor Changes
+
+- 6a9b4a5: Add optional project parameter to analyzeRenderTree and export createProject. Callers can now pass a shared Project instance to avoid repeated initialization overhead.
+
 ## 0.1.0
 
 ### Minor Changes
