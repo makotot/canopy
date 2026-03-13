@@ -1,0 +1,44 @@
+# Workaround for first-time publish of new scoped packages.
+#
+# npm's OIDC Trusted Publishing (used in the regular Publish workflow) cannot
+# publish a brand-new package. The registry returns E404 because there is no
+# existing package entry to attach the OIDC trust grant to.
+#
+# See: https://github.com/npm/cli/issues/8544
+#
+# Usage: Run this workflow manually via workflow_dispatch with the package name.
+# After this succeeds, the regular Publish workflow handles all future versions
+# via OIDC Trusted Publishing.
+
+name: Publish New Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      package_name:
+        description: 'Package name (e.g. @makotot/canopy-annotator-foo)'
+        required: true
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: jdx/mise-action@v3
+
+      - uses: actions/setup-node@v5
+        with:
+          registry-url: https://registry.npmjs.org
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm --filter "${{ inputs.package_name }}" build
+
+      - name: Publish new package
+        run: pnpm --filter "${{ inputs.package_name }}" publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
