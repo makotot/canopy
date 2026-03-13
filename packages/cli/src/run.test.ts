@@ -6,6 +6,9 @@ import { run } from './run.js';
 const fixture = (name: string) =>
   new URL(`../../core/src/__fixtures__/${name}`, import.meta.url).pathname;
 
+const asyncFixture = (name: string) =>
+  new URL(`../../annotator-async/src/__fixtures__/${name}`, import.meta.url).pathname;
+
 describe('run', () => {
   let project: Project;
   beforeAll(() => {
@@ -36,23 +39,74 @@ describe('run', () => {
     },
   ])('$label', ({ fixture: f, assert }) => {
     let output = '';
-    run(fixture(f), (s) => { output = s; }, project);
+    run(
+      fixture(f),
+      (s) => {
+        output = s;
+      },
+      project,
+    );
     assert(output);
   });
 
   it('outputs named export component when componentName is specified', () => {
     let output = '';
-    run(fixture('named-export-component.tsx'), (s) => { output = s; }, project, 'Header');
+    run(
+      fixture('named-export-component.tsx'),
+      (s) => {
+        output = s;
+      },
+      project,
+      'Header',
+    );
     expect(output).toContain('Header');
   });
 
   it('auto-detects named export when no default export', () => {
     let output = '';
-    run(fixture('named-export-component.tsx'), (s) => { output = s; }, project);
+    run(
+      fixture('named-export-component.tsx'),
+      (s) => {
+        output = s;
+      },
+      project,
+    );
     expect(output).toContain('Header');
   });
 
   it('throws for non-existent file', () => {
     expect(() => run('/nonexistent/page.tsx', () => {})).toThrow('File not found');
+  });
+
+  it('does not annotate async without --annotator async', () => {
+    let output = '';
+    run(
+      asyncFixture('page-with-async.tsx'),
+      (s) => {
+        output = s;
+      },
+      project,
+    );
+    expect(output).not.toContain('[async]');
+  });
+
+  it('annotates async with --annotator async', () => {
+    let output = '';
+    run(
+      asyncFixture('page-with-async.tsx'),
+      (s) => {
+        output = s;
+      },
+      project,
+      undefined,
+      ['async'],
+    );
+    expect(output).toContain('[async]');
+  });
+
+  it('throws for unknown annotator name', () => {
+    expect(() =>
+      run(fixture('simple-page.tsx'), () => {}, project, undefined, ['unknown-annotator']),
+    ).toThrow('Unknown annotator: unknown-annotator');
   });
 });

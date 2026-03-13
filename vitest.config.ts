@@ -4,9 +4,18 @@ import { fileURLToPath } from 'url';
 export default defineConfig({
   resolve: {
     alias: {
-      '@makotot/canopy-core': fileURLToPath(new URL('./packages/core/src/index.ts', import.meta.url)),
-      '@makotot/canopy-annotator-async': fileURLToPath(new URL('./packages/annotator-async/src/index.ts', import.meta.url)),
-      '@makotot/canopy-reporter-mermaid': fileURLToPath(new URL('./packages/reporter-mermaid/src/index.ts', import.meta.url)),
+      '@makotot/canopy-core': fileURLToPath(
+        new URL('./packages/core/src/index.ts', import.meta.url),
+      ),
+      '@makotot/canopy-annotator-async': fileURLToPath(
+        new URL('./packages/annotator-async/src/index.ts', import.meta.url),
+      ),
+      '@makotot/canopy-annotator-client-boundary': fileURLToPath(
+        new URL('./packages/annotator-client-boundary/src/index.ts', import.meta.url),
+      ),
+      '@makotot/canopy-reporter-mermaid': fileURLToPath(
+        new URL('./packages/reporter-mermaid/src/index.ts', import.meta.url),
+      ),
     },
   },
   test: {

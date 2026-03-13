@@ -3,9 +3,5 @@ function Fallback() {
 }
 
 export default function Page({ content }: { content: React.ReactNode }) {
-  return (
-    <main>
-      {content || <Fallback />}
-    </main>
-  );
+  return <main>{content || <Fallback />}</main>;
 }

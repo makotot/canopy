@@ -19,8 +19,14 @@ describe('createPipeline', () => {
       setup: () => {
         const order: number[] = [];
         const annotators = [
-          (g: { value: number }) => { order.push(1); return { value: g.value + 1 }; },
-          (g: { value: number }) => { order.push(2); return { value: g.value + 10 }; },
+          (g: { value: number }) => {
+            order.push(1);
+            return { value: g.value + 1 };
+          },
+          (g: { value: number }) => {
+            order.push(2);
+            return { value: g.value + 10 };
+          },
         ];
         createPipeline({ build: () => ({ value: 0 }), annotators, reporter: () => {} });
         return { order };

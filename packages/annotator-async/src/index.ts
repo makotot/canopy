@@ -13,7 +13,7 @@ function annotateNode(node: TreeNode, sourceFilePath: string, project: Project):
   const children = node.children.map((child) => annotateNode(child, sourceFilePath, project));
   return {
     ...node,
-    ...(isAsync ? { meta: { ...node.meta, async: true } } : {}),
+    ...(isAsync ? { meta: { ...node.meta, async: true, badge: 'async' } } : {}),
     children,
     ...(node.props
       ? {
@@ -37,11 +37,7 @@ function resolveAndCheckAsync(
   if (!fn) {
     return false;
   }
-  if (
-    Node.isFunctionDeclaration(fn) ||
-    Node.isFunctionExpression(fn) ||
-    Node.isArrowFunction(fn)
-  ) {
+  if (Node.isFunctionDeclaration(fn) || Node.isFunctionExpression(fn) || Node.isArrowFunction(fn)) {
     return fn.isAsync();
   }
   return false;

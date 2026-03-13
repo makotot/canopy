@@ -4,7 +4,12 @@ import { parseJsxElement, parseSelfClosingElement, parseJsxChildren } from './pa
 import type { TreeNode } from './analyze.js';
 
 /** @internal */
-export function resolveNode(node: TreeNode, callerFilePath: string, project: Project, visited: Set<string>): TreeNode {
+export function resolveNode(
+  node: TreeNode,
+  callerFilePath: string,
+  project: Project,
+  visited: Set<string>,
+): TreeNode {
   const resolvedProps = node.props
     ? Object.fromEntries(
         Object.entries(node.props).map(([k, v]) => [

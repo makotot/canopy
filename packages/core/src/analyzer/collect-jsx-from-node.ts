@@ -15,14 +15,22 @@ export function collectJsxFromNode(node: Node, sourceFile: SourceFile): TreeNode
   }
   if (Node.isConditionalExpression(node)) {
     return [
-      ...withAnnotation(collectJsxFromNode(node.getWhenTrue(), sourceFile), { condition: 'ternary', branch: 'consequent' }),
-      ...withAnnotation(collectJsxFromNode(node.getWhenFalse(), sourceFile), { condition: 'ternary', branch: 'alternate' }),
+      ...withAnnotation(collectJsxFromNode(node.getWhenTrue(), sourceFile), {
+        condition: 'ternary',
+        branch: 'consequent',
+      }),
+      ...withAnnotation(collectJsxFromNode(node.getWhenFalse(), sourceFile), {
+        condition: 'ternary',
+        branch: 'alternate',
+      }),
     ];
   }
   if (Node.isBinaryExpression(node)) {
     const op = node.getOperatorToken().getText();
     if (op === '&&') {
-      return withAnnotation(collectJsxFromNode(node.getRight(), sourceFile), { condition: 'logical' });
+      return withAnnotation(collectJsxFromNode(node.getRight(), sourceFile), {
+        condition: 'logical',
+      });
     }
     if (op === '||' || op === '??') {
       return [
@@ -60,8 +68,12 @@ export function collectJsxFromNode(node: Node, sourceFile: SourceFile): TreeNode
 
 function collectJsxFromDescendants(node: Node, sourceFile: SourceFile): TreeNode[] {
   return [
-    ...node.getDescendantsOfKind(SyntaxKind.JsxElement).map((child) => parseJsxElement(child, sourceFile)),
-    ...node.getDescendantsOfKind(SyntaxKind.JsxSelfClosingElement).map((child) => parseSelfClosingElement(child, sourceFile)),
+    ...node
+      .getDescendantsOfKind(SyntaxKind.JsxElement)
+      .map((child) => parseJsxElement(child, sourceFile)),
+    ...node
+      .getDescendantsOfKind(SyntaxKind.JsxSelfClosingElement)
+      .map((child) => parseSelfClosingElement(child, sourceFile)),
   ];
 }
 

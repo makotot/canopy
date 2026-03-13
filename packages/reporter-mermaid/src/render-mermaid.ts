@@ -1,30 +1,99 @@
 import type { TreeNode } from '@makotot/canopy-core';
 
 export function renderMermaid(tree: TreeNode): string {
-  const nodeLines: string[] = [];
-  const edgeLines: string[] = [];
-  let counter = 0;
+  const nodeDefs: string[] = [];
+  const edgeDefs: string[] = [];
+  const styleDefs: string[] = [];
+  const counter = { n: 0 };
 
-  function visit(node: TreeNode, parentId: string | null): void {
-    const id = `n${counter++}`;
-    nodeLines.push(`  ${id}["${buildLabel(node)}"]`);
-    if (parentId !== null) {
-      edgeLines.push(`  ${parentId} ${buildEdge(node)} ${id}`);
-    }
-    for (const child of node.children) {
-      visit(child, id);
-    }
+  visit({ node: tree, parentId: null, nodeDefs, edgeDefs, styleDefs, counter, inGroup: false });
+
+  return [`flowchart TD`, ...nodeDefs, ...edgeDefs, ...styleDefs].join('\n');
+}
+
+interface VisitOptions {
+  node: TreeNode;
+  /** ID of the parent node, or null for the root. */
+  parentId: string | null;
+  /** Accumulated node definition lines (e.g. `n0["Page"]`, `subgraph`, `end`). */
+  nodeDefs: string[];
+  /** Accumulated edge definition lines (e.g. `n0 --> n1`). Placed after all node defs. */
+  edgeDefs: string[];
+  /** Accumulated style directive lines (e.g. `style n1 fill:...`). Placed last. */
+  styleDefs: string[];
+  /** Monotonically incrementing counter shared across the entire traversal. */
+  counter: { n: number };
+  /** True when currently inside a subgraph block. Prevents nested subgraphs. */
+  inGroup: boolean;
+  /** Indentation prefix for node definition lines. Increases inside subgraph blocks. */
+  indent?: string;
+}
+
+/** @internal */
+function visit({
+  node,
+  parentId,
+  nodeDefs,
+  edgeDefs,
+  styleDefs,
+  counter,
+  inGroup,
+  indent = '  ',
+}: VisitOptions): void {
+  const group = node.meta?.group as string | undefined;
+  const style = node.meta?.style as { fill: string; stroke: string } | undefined;
+  const openSubgraph = !!group && !inGroup && node.children.length > 0;
+  const id = `n${counter.n++}`;
+
+  if (parentId !== null) {
+    edgeDefs.push(`  ${parentId} ${buildEdge(node)} ${id}`);
   }
 
-  visit(tree, null);
-  return [`flowchart TD`, ...nodeLines, ...edgeLines].join('\n');
+  nodeDefs.push(`${indent}${id}["${buildLabel(node)}"]`);
+
+  if (style) {
+    styleDefs.push(`  style ${id} fill:${style.fill},stroke:${style.stroke}`);
+  }
+
+  if (openSubgraph) {
+    const sgId = `sg${counter.n++}`;
+    nodeDefs.push(`  subgraph ${sgId} ["${group}"]`);
+    for (const child of node.children) {
+      visit({
+        node: child,
+        parentId: id,
+        nodeDefs,
+        edgeDefs,
+        styleDefs,
+        counter,
+        inGroup: true,
+        indent: '    ',
+      });
+    }
+    nodeDefs.push(`  end`);
+  } else {
+    for (const child of node.children) {
+      visit({
+        node: child,
+        parentId: id,
+        nodeDefs,
+        edgeDefs,
+        styleDefs,
+        counter,
+        inGroup: !!group || inGroup,
+        indent,
+      });
+    }
+  }
 }
 
+/** @internal */
 function buildLabel(node: TreeNode): string {
-  const badge = node.meta?.async ? ' [async]' : '';
-  return `${node.component}${badge}`;
+  const badge = node.meta?.badge as string | undefined;
+  return badge ? `${node.component} [${badge}]` : node.component;
 }
 
+/** @internal */
 function buildEdge(node: TreeNode): string {
   if (node.condition === 'ternary' && node.branch === 'consequent') {
     return '-->|? true|';

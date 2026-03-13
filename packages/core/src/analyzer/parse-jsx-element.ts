@@ -12,7 +12,10 @@ export function parseJsxElement(element: JsxElement, sourceFile: SourceFile): Tr
 }
 
 /** @internal */
-export function parseSelfClosingElement(element: JsxSelfClosingElement, sourceFile: SourceFile): TreeNode {
+export function parseSelfClosingElement(
+  element: JsxSelfClosingElement,
+  sourceFile: SourceFile,
+): TreeNode {
   return {
     component: getTagName(element),
     children: [],
