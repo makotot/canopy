@@ -1,6 +1,6 @@
 {
   "name": "@makotot/canopy-annotator-async",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Canopy annotator — detects async React components",
   "license": "MIT",
   "repository": {

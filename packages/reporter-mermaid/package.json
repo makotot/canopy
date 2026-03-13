@@ -1,6 +1,6 @@
 {
   "name": "@makotot/canopy-reporter-mermaid",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Canopy reporter — renders render trees as Mermaid flowcharts",
   "license": "MIT",
   "repository": {

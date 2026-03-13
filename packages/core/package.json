@@ -1,6 +1,6 @@
 {
   "name": "@makotot/canopy-core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Core analyzer and pipeline for Canopy — static React render tree analysis",
   "license": "MIT",
   "repository": {

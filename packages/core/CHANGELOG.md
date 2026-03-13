@@ -1,5 +1,11 @@
 # @makotot/canopy-core
 
+## 0.3.0
+
+### Minor Changes
+
+- 1a4f11e: Added --component <name> option to specify which named exported component to analyze. Required when the file exports multiple components and has no default export.
+
 ## 0.2.0
 
 ### Minor Changes
