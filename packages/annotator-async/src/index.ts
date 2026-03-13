@@ -13,7 +13,7 @@ function annotateNode(node: TreeNode, sourceFilePath: string, project: Project):
   const children = node.children.map((child) => annotateNode(child, sourceFilePath, project));
   return {
     ...node,
-    ...(isAsync ? { meta: { ...node.meta, async: true } } : {}),
+    ...(isAsync ? { meta: { ...node.meta, async: true, badge: 'async' } } : {}),
     children,
     ...(node.props
       ? {

@@ -45,11 +45,23 @@ importers:
         specifier: 27.0.2
         version: 27.0.2
 
+  packages/annotator-client-boundary:
+    dependencies:
+      '@makotot/canopy-core':
+        specifier: workspace:*
+        version: link:../core
+      ts-morph:
+        specifier: 27.0.2
+        version: 27.0.2
+
   packages/cli:
     dependencies:
       '@makotot/canopy-annotator-async':
         specifier: workspace:*
         version: link:../annotator-async
+      '@makotot/canopy-annotator-client-boundary':
+        specifier: workspace:*
+        version: link:../annotator-client-boundary
       '@makotot/canopy-core':
         specifier: workspace:*
         version: link:../core

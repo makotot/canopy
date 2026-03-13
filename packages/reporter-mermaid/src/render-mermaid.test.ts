@@ -22,10 +22,10 @@ describe('renderMermaid', () => {
   n0 --> n1`,
     },
     {
-      label: 'async component adds badge',
+      label: 'meta.badge renders as label suffix',
       tree: {
         component: 'Page',
-        children: [{ component: 'AsyncData', meta: { async: true }, children: [] }],
+        children: [{ component: 'AsyncData', meta: { badge: 'async' }, children: [] }],
       } satisfies TreeNode,
       expected: `flowchart TD
   n0["Page"]
@@ -58,6 +58,89 @@ describe('renderMermaid', () => {
   n0["Page"]
   n1["Banner"]
   n0 -->|&&| n1`,
+    },
+    {
+      label: 'meta.style applies style directive',
+      tree: {
+        component: 'Page',
+        children: [
+          {
+            component: 'ClientWidget',
+            meta: { badge: 'client', style: { fill: '#dbeafe', stroke: '#93c5fd' } },
+            children: [],
+          },
+        ],
+      } satisfies TreeNode,
+      expected: `flowchart TD
+  n0["Page"]
+  n1["ClientWidget [client]"]
+  n0 --> n1
+  style n1 fill:#dbeafe,stroke:#93c5fd`,
+    },
+    {
+      label: 'meta.group with children wraps subtree in subgraph',
+      tree: {
+        component: 'Page',
+        children: [
+          {
+            component: 'ClientWidget',
+            meta: {
+              badge: 'client',
+              group: 'client',
+              style: { fill: '#dbeafe', stroke: '#93c5fd' },
+            },
+            children: [{ component: 'button', children: [] }],
+          },
+        ],
+      } satisfies TreeNode,
+      expected: `flowchart TD
+  n0["Page"]
+  n1["ClientWidget [client]"]
+  subgraph sg2 ["client"]
+    n3["button"]
+  end
+  n0 --> n1
+  n1 --> n3
+  style n1 fill:#dbeafe,stroke:#93c5fd`,
+    },
+    {
+      label: 'components already inside a group subgraph are not re-wrapped',
+      tree: {
+        component: 'Page',
+        children: [
+          {
+            component: 'ClientWidget',
+            meta: {
+              badge: 'client',
+              group: 'client',
+              style: { fill: '#dbeafe', stroke: '#93c5fd' },
+            },
+            children: [
+              {
+                component: 'InnerClient',
+                meta: {
+                  badge: 'client',
+                  group: 'client',
+                  style: { fill: '#dbeafe', stroke: '#93c5fd' },
+                },
+                children: [{ component: 'span', children: [] }],
+              },
+            ],
+          },
+        ],
+      } satisfies TreeNode,
+      expected: `flowchart TD
+  n0["Page"]
+  n1["ClientWidget [client]"]
+  subgraph sg2 ["client"]
+    n3["InnerClient [client]"]
+    n4["span"]
+  end
+  n0 --> n1
+  n1 --> n3
+  n3 --> n4
+  style n1 fill:#dbeafe,stroke:#93c5fd
+  style n3 fill:#dbeafe,stroke:#93c5fd`,
     },
   ])('$label', ({ tree, expected }) => {
     expect(renderMermaid(tree)).toBe(expected);

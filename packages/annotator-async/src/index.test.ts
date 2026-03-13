@@ -45,4 +45,14 @@ describe('createAsyncAnnotator', () => {
     const annotator = createAsyncAnnotator(sourceFilePath, project);
     expect(get(annotator(tree))).toBe(expected);
   });
+
+  it('sets meta.badge to "async" on async component', () => {
+    const { tree, sourceFilePath } = analyzeRenderTree({
+      filePath: fixture('page-with-async.tsx'),
+      project,
+    });
+    const annotator = createAsyncAnnotator(sourceFilePath, project);
+    // page-with-async.tsx tree: Page > main > AsyncData (children[0].children[0])
+    expect(annotator(tree).children[0]?.children[0]?.meta?.['badge']).toBe('async');
+  });
 });

@@ -1,0 +1,29 @@
+{
+  "name": "@makotot/canopy-annotator-client-boundary",
+  "version": "0.1.0",
+  "description": "Canopy annotator — detects React Server Components client boundary",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/makotot/canopy.git",
+    "directory": "packages/annotator-client-boundary"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@makotot/canopy-core": "workspace:*",
+    "ts-morph": "27.0.2"
+  }
+}

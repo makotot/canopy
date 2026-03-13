@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@makotot/canopy-annotator-async": "workspace:*",
+    "@makotot/canopy-annotator-client-boundary": "workspace:*",
     "@makotot/canopy-core": "workspace:*",
     "@makotot/canopy-reporter-mermaid": "workspace:*",
     "cac": "7.0.0"
