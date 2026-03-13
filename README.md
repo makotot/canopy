@@ -55,9 +55,18 @@ Annotators are opt-in via `--annotator`. Multiple flags can be combined.
 | `--annotator async`           | Marks `async` server components with `[async]`                                |
 | `--annotator client-boundary` | Marks RSC client boundary components with `[client]` and groups their subtree |
 
+### Interactive mode
+
+Run without arguments to launch an interactive prompt that guides you through selecting the entry point, component name, and annotators:
+
+```sh
+canopy -i
+```
+
 ### Options
 
 ```
+-i, --interactive    Launch interactive mode
 --component <name>   Analyze a named export instead of the default export
 --annotator <name>   Annotator to apply (repeatable)
 ```
