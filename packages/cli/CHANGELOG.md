@@ -1,5 +1,18 @@
 # @makotot/canopy-cli
 
+## 0.2.0
+
+### Minor Changes
+
+- 6a9b4a5: Add optional project parameter to analyzeRenderTree and export createProject. Callers can now pass a shared Project instance to avoid repeated initialization overhead.
+
+### Patch Changes
+
+- Updated dependencies [6a9b4a5]
+  - @makotot/canopy-annotator-async@0.2.0
+  - @makotot/canopy-core@0.2.0
+  - @makotot/canopy-reporter-mermaid@0.1.1
+
 ## 0.1.1
 
 ### Patch Changes
