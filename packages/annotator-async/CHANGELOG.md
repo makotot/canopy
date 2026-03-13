@@ -1,5 +1,16 @@
 # @makotot/canopy-annotator-async
 
+## 0.3.0
+
+### Minor Changes
+
+- 1a4f11e: Added --component <name> option to specify which named exported component to analyze. Required when the file exports multiple components and has no default export.
+
+### Patch Changes
+
+- Updated dependencies [1a4f11e]
+  - @makotot/canopy-core@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes
