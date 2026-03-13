@@ -15,4 +15,3 @@ export function getNamedExportedFunction(sourceFile: SourceFile, name: string) {
   }
   return undefined;
 }
-

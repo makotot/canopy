@@ -6,8 +6,8 @@ Changeset files live in `.changeset/*.md` and follow this structure:
 
 ```markdown
 ---
-"@makotot/canopy-foo": minor
-"@makotot/canopy-bar": patch
+'@makotot/canopy-foo': minor
+'@makotot/canopy-bar': patch
 ---
 
 One-paragraph summary of what changed and why.
@@ -17,11 +17,11 @@ One-paragraph summary of what changed and why.
 
 All packages are currently `0.x.x`. Do **not** use `major` — it would bump to `1.0.0`.
 
-| Change type | Bump |
-|---|---|
-| Breaking change | `minor` |
+| Change type               | Bump    |
+| ------------------------- | ------- |
+| Breaking change           | `minor` |
 | New feature / new package | `minor` |
-| Bug fix / additive patch | `patch` |
+| Bug fix / additive patch  | `patch` |
 
 ## Scope
 

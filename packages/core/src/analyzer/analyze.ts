@@ -48,7 +48,11 @@ export interface AnalyzeOptions {
   project?: Project;
 }
 
-export function analyzeRenderTree({ filePath, componentName, project }: AnalyzeOptions): AnalyzeResult {
+export function analyzeRenderTree({
+  filePath,
+  componentName,
+  project,
+}: AnalyzeOptions): AnalyzeResult {
   const absolutePath = path.resolve(filePath);
   if (!fs.existsSync(absolutePath)) {
     throw new Error(`File not found: ${absolutePath}`);

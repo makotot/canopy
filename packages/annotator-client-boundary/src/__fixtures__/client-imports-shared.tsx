@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import SharedUtil from './shared-util';
 

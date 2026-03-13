@@ -41,10 +41,14 @@ Annotators that want to influence rendering **must** write to the following rese
 
 ```ts
 // annotator-async sets:
-meta: { badge: 'async' }
+meta: {
+  badge: 'async';
+}
 
 // annotator-client-boundary sets:
-meta: { badge: 'client' }
+meta: {
+  badge: 'client';
+}
 ```
 
 ### `meta.group`
@@ -55,7 +59,9 @@ Only the first component with a given group name opens the subgraph; components 
 
 ```ts
 // annotator-client-boundary sets:
-meta: { group: 'client' }
+meta: {
+  group: 'client';
+}
 ```
 
 ### `meta.style`

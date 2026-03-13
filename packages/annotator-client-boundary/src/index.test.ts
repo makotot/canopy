@@ -3,8 +3,7 @@ import { type Project } from 'ts-morph';
 import { analyzeRenderTree, createProject, type TreeNode } from '@makotot/canopy-core';
 import { createClientBoundaryAnnotator } from './index.js';
 
-const fixture = (name: string) =>
-  new URL(`./__fixtures__/${name}`, import.meta.url).pathname;
+const fixture = (name: string) => new URL(`./__fixtures__/${name}`, import.meta.url).pathname;
 
 // page-with-client-and-server.tsx tree:
 //   Page
@@ -50,7 +49,8 @@ describe('createClientBoundaryAnnotator', () => {
       expected: true,
     },
     {
-      label: 'marks SharedUtil (transitively imported by a "use client" file) with meta.client: true',
+      label:
+        'marks SharedUtil (transitively imported by a "use client" file) with meta.client: true',
       fixture: 'page-with-transitive-client.tsx',
       get: (tree: TreeNode) => tree.children[0]?.children[0]?.children[0]?.meta?.['client'],
       expected: true,

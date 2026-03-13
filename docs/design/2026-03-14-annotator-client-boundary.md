@@ -79,11 +79,11 @@ graph TD
 
 Packages affected:
 
-| Package | Change |
-|---|---|
+| Package                     | Change                                                                                    |
+| --------------------------- | ----------------------------------------------------------------------------------------- |
 | `annotator-client-boundary` | **New** — traverses import graph and sets `meta.client: true` on client module components |
-| `reporter-mermaid` | **Update** — renders `meta.client` as `subgraph` grouping with blue `style` directive |
-| `cli` | **Update** — `--annotator` opt-in flag to load annotators |
+| `reporter-mermaid`          | **Update** — renders `meta.client` as `subgraph` grouping with blue `style` directive     |
+| `cli`                       | **Update** — `--annotator` opt-in flag to load annotators                                 |
 
 ---
 
@@ -145,7 +145,7 @@ export function run(
 export function createClientBoundaryAnnotator(
   sourceFilePath: string,
   project: Project,
-): Annotator<TreeNode>
+): Annotator<TreeNode>;
 ```
 
 - `sourceFilePath` — absolute path to the entry file passed to `analyzeRenderTree`. Used as the root from which import discovery starts.
@@ -159,7 +159,7 @@ A node is annotated when its component resolves to a source file that is a clien
 
 ```ts
 meta: {
-  client: true  // present only when the component is in the client graph
+  client: true; // present only when the component is in the client graph
 }
 ```
 
@@ -216,14 +216,14 @@ After building `clientModules`, walk the `TreeNode` tree recursively:
 
 All fixtures live under `src/__fixtures__/`.
 
-| File | Purpose |
-|---|---|
-| `page-with-client-and-server.tsx` | Entry; renders `ClientWidget` and `ServerWidget` side-by-side. Primary fixture for the direct boundary case. |
-| `client-widget.tsx` | Has `"use client"` at top. Direct client boundary. |
-| `server-widget.tsx` | No directive. Should not be annotated. |
+| File                              | Purpose                                                                                                       |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `page-with-client-and-server.tsx` | Entry; renders `ClientWidget` and `ServerWidget` side-by-side. Primary fixture for the direct boundary case.  |
+| `client-widget.tsx`               | Has `"use client"` at top. Direct client boundary.                                                            |
+| `server-widget.tsx`               | No directive. Should not be annotated.                                                                        |
 | `page-with-transitive-client.tsx` | Entry; renders `ClientImportsShared` which in turn renders `SharedUtil`. Demonstrates transitive propagation. |
-| `client-imports-shared.tsx` | Has `"use client"` and imports `SharedUtil`. |
-| `shared-util.tsx` | No directive; pulled into the client graph transitively via `client-imports-shared.tsx`. |
+| `client-imports-shared.tsx`       | Has `"use client"` and imports `SharedUtil`.                                                                  |
+| `shared-util.tsx`                 | No directive; pulled into the client graph transitively via `client-imports-shared.tsx`.                      |
 
 ---
 

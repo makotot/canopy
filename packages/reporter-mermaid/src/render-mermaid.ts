@@ -59,15 +59,32 @@ function visit({
     const sgId = `sg${counter.n++}`;
     nodeDefs.push(`  subgraph ${sgId} ["${group}"]`);
     for (const child of node.children) {
-      visit({ node: child, parentId: id, nodeDefs, edgeDefs, styleDefs, counter, inGroup: true, indent: '    ' });
+      visit({
+        node: child,
+        parentId: id,
+        nodeDefs,
+        edgeDefs,
+        styleDefs,
+        counter,
+        inGroup: true,
+        indent: '    ',
+      });
     }
     nodeDefs.push(`  end`);
   } else {
     for (const child of node.children) {
-      visit({ node: child, parentId: id, nodeDefs, edgeDefs, styleDefs, counter, inGroup: !!group || inGroup, indent });
+      visit({
+        node: child,
+        parentId: id,
+        nodeDefs,
+        edgeDefs,
+        styleDefs,
+        counter,
+        inGroup: !!group || inGroup,
+        indent,
+      });
     }
   }
-
 }
 
 /** @internal */

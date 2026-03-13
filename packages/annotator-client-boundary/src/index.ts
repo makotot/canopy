@@ -1,4 +1,9 @@
-import { resolveComponent, resolveModulePath, type Annotator, type TreeNode } from '@makotot/canopy-core';
+import {
+  resolveComponent,
+  resolveModulePath,
+  type Annotator,
+  type TreeNode,
+} from '@makotot/canopy-core';
 import { Node, type SourceFile, type Project } from 'ts-morph';
 import * as path from 'node:path';
 
@@ -22,18 +27,22 @@ function annotateNode(
   const fn = resolveComponent(node.component, sourceFilePath, project);
   const isClient = fn ? clientModules.has(fn.getSourceFile().getFilePath()) : false;
   const childSourceFilePath = fn ? fn.getSourceFile().getFilePath() : sourceFilePath;
-  const children = node.children.map((c) => annotateNode(c, childSourceFilePath, project, clientModules));
+  const children = node.children.map((c) =>
+    annotateNode(c, childSourceFilePath, project, clientModules),
+  );
   return {
     ...node,
-    ...(isClient ? {
-      meta: {
-        ...node.meta,
-        client: true,
-        badge: 'client',
-        group: 'client',
-        style: { fill: '#dbeafe', stroke: '#93c5fd' },
-      },
-    } : {}),
+    ...(isClient
+      ? {
+          meta: {
+            ...node.meta,
+            client: true,
+            badge: 'client',
+            group: 'client',
+            style: { fill: '#dbeafe', stroke: '#93c5fd' },
+          },
+        }
+      : {}),
     children,
     ...(node.props
       ? {
@@ -54,15 +63,21 @@ function buildClientModuleSet(entryFilePath: string, project: Project): Set<stri
 
   function discoverImports(sf: SourceFile): void {
     const filePath = sf.getFilePath();
-    if (discovered.has(filePath)) return;
+    if (discovered.has(filePath)) {
+      return;
+    }
     discovered.add(filePath);
     importGraph.set(filePath, new Set());
 
     for (const decl of sf.getImportDeclarations()) {
       const specifier = decl.getModuleSpecifierValue();
-      if (!specifier.startsWith('.')) continue;
+      if (!specifier.startsWith('.')) {
+        continue;
+      }
       const resolved = resolveModulePath(specifier, filePath);
-      if (!resolved) continue;
+      if (!resolved) {
+        continue;
+      }
       let targetSf = project.getSourceFile(resolved);
       if (!targetSf) {
         try {
@@ -77,13 +92,17 @@ function buildClientModuleSet(entryFilePath: string, project: Project): Set<stri
   }
 
   const entrySf = project.getSourceFile(entryFilePath);
-  if (entrySf) discoverImports(entrySf);
+  if (entrySf) {
+    discoverImports(entrySf);
+  }
 
   const clientModules = new Set<string>();
   const visitedClient = new Set<string>();
 
   function markAsClient(filePath: string): void {
-    if (visitedClient.has(filePath)) return;
+    if (visitedClient.has(filePath)) {
+      return;
+    }
     visitedClient.add(filePath);
     clientModules.add(filePath);
     for (const imported of importGraph.get(filePath) ?? []) {
@@ -93,7 +112,9 @@ function buildClientModuleSet(entryFilePath: string, project: Project): Set<stri
 
   for (const filePath of discovered) {
     const sf = project.getSourceFile(filePath);
-    if (sf && hasUseClientDirective(sf)) markAsClient(filePath);
+    if (sf && hasUseClientDirective(sf)) {
+      markAsClient(filePath);
+    }
   }
 
   return clientModules;
@@ -101,7 +122,9 @@ function buildClientModuleSet(entryFilePath: string, project: Project): Set<stri
 
 function hasUseClientDirective(sourceFile: SourceFile): boolean {
   const first = sourceFile.getStatements()[0];
-  if (!first || !Node.isExpressionStatement(first)) return false;
+  if (!first || !Node.isExpressionStatement(first)) {
+    return false;
+  }
   const expr = first.getExpression();
   return Node.isStringLiteral(expr) && expr.getLiteralValue() === 'use client';
 }

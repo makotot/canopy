@@ -50,9 +50,9 @@ flowchart TD
 
 Annotators are opt-in via `--annotator`. Multiple flags can be combined.
 
-| Flag | Description |
-|---|---|
-| `--annotator async` | Marks `async` server components with `[async]` |
+| Flag                          | Description                                                                   |
+| ----------------------------- | ----------------------------------------------------------------------------- |
+| `--annotator async`           | Marks `async` server components with `[async]`                                |
 | `--annotator client-boundary` | Marks RSC client boundary components with `[client]` and groups their subtree |
 
 ### Options
@@ -81,13 +81,13 @@ node packages/cli/dist/cli.js <file>
 
 ## Packages
 
-| Package | Description |
-|---|---|
-| [`@makotot/canopy-cli`](./packages/cli) | CLI entrypoint (`canopy` command) |
-| [`@makotot/canopy-core`](./packages/core) | Analyzer, pipeline, and shared types |
-| [`@makotot/canopy-annotator-async`](./packages/annotator-async) | Marks `async` server components |
+| Package                                                                             | Description                          |
+| ----------------------------------------------------------------------------------- | ------------------------------------ |
+| [`@makotot/canopy-cli`](./packages/cli)                                             | CLI entrypoint (`canopy` command)    |
+| [`@makotot/canopy-core`](./packages/core)                                           | Analyzer, pipeline, and shared types |
+| [`@makotot/canopy-annotator-async`](./packages/annotator-async)                     | Marks `async` server components      |
 | [`@makotot/canopy-annotator-client-boundary`](./packages/annotator-client-boundary) | Marks RSC client boundary components |
-| [`@makotot/canopy-reporter-mermaid`](./packages/reporter-mermaid) | Renders Mermaid flowchart output |
+| [`@makotot/canopy-reporter-mermaid`](./packages/reporter-mermaid)                   | Renders Mermaid flowchart output     |
 
 ## Requirements
 

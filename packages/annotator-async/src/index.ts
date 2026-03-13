@@ -37,11 +37,7 @@ function resolveAndCheckAsync(
   if (!fn) {
     return false;
   }
-  if (
-    Node.isFunctionDeclaration(fn) ||
-    Node.isFunctionExpression(fn) ||
-    Node.isArrowFunction(fn)
-  ) {
+  if (Node.isFunctionDeclaration(fn) || Node.isFunctionExpression(fn) || Node.isArrowFunction(fn)) {
     return fn.isAsync();
   }
   return false;

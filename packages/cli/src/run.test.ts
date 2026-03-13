@@ -39,19 +39,38 @@ describe('run', () => {
     },
   ])('$label', ({ fixture: f, assert }) => {
     let output = '';
-    run(fixture(f), (s) => { output = s; }, project);
+    run(
+      fixture(f),
+      (s) => {
+        output = s;
+      },
+      project,
+    );
     assert(output);
   });
 
   it('outputs named export component when componentName is specified', () => {
     let output = '';
-    run(fixture('named-export-component.tsx'), (s) => { output = s; }, project, 'Header');
+    run(
+      fixture('named-export-component.tsx'),
+      (s) => {
+        output = s;
+      },
+      project,
+      'Header',
+    );
     expect(output).toContain('Header');
   });
 
   it('auto-detects named export when no default export', () => {
     let output = '';
-    run(fixture('named-export-component.tsx'), (s) => { output = s; }, project);
+    run(
+      fixture('named-export-component.tsx'),
+      (s) => {
+        output = s;
+      },
+      project,
+    );
     expect(output).toContain('Header');
   });
 
@@ -61,13 +80,27 @@ describe('run', () => {
 
   it('does not annotate async without --annotator async', () => {
     let output = '';
-    run(asyncFixture('page-with-async.tsx'), (s) => { output = s; }, project);
+    run(
+      asyncFixture('page-with-async.tsx'),
+      (s) => {
+        output = s;
+      },
+      project,
+    );
     expect(output).not.toContain('[async]');
   });
 
   it('annotates async with --annotator async', () => {
     let output = '';
-    run(asyncFixture('page-with-async.tsx'), (s) => { output = s; }, project, undefined, ['async']);
+    run(
+      asyncFixture('page-with-async.tsx'),
+      (s) => {
+        output = s;
+      },
+      project,
+      undefined,
+      ['async'],
+    );
     expect(output).toContain('[async]');
   });
 

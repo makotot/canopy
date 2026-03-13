@@ -3,8 +3,7 @@ import { type Project } from 'ts-morph';
 import { analyzeRenderTree, createProject, type TreeNode } from '@makotot/canopy-core';
 import { createAsyncAnnotator } from './index.js';
 
-const fixture = (name: string) =>
-  new URL(`./__fixtures__/${name}`, import.meta.url).pathname;
+const fixture = (name: string) => new URL(`./__fixtures__/${name}`, import.meta.url).pathname;
 
 describe('createAsyncAnnotator', () => {
   let project: Project;
@@ -36,8 +35,9 @@ describe('createAsyncAnnotator', () => {
       label: 'annotates async component inside render prop',
       fixture: 'page-with-render-prop.tsx',
       get: (tree: TreeNode) =>
-        tree.children[0]?.children[0]?.children.find((c) => c.component === 'AsyncData')
-          ?.meta?.['async'],
+        tree.children[0]?.children[0]?.children.find((c) => c.component === 'AsyncData')?.meta?.[
+          'async'
+        ],
       expected: true,
     },
   ])('$label', ({ fixture: f, get, expected }) => {

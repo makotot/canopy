@@ -10,7 +10,10 @@ import { createClientBoundaryAnnotator } from '@makotot/canopy-annotator-client-
 import { createMermaidReporter } from '@makotot/canopy-reporter-mermaid';
 import { type Project } from 'ts-morph';
 
-const ANNOTATORS: Record<string, (sourceFilePath: string, project: Project) => Annotator<TreeNode>> = {
+const ANNOTATORS: Record<
+  string,
+  (sourceFilePath: string, project: Project) => Annotator<TreeNode>
+> = {
   async: createAsyncAnnotator,
   'client-boundary': createClientBoundaryAnnotator,
 };
@@ -27,7 +30,11 @@ export function run(
       throw new Error(`Unknown annotator: ${name}`);
     }
   }
-  const { tree, project: resolvedProject, sourceFilePath } = analyzeRenderTree({
+  const {
+    tree,
+    project: resolvedProject,
+    sourceFilePath,
+  } = analyzeRenderTree({
     filePath,
     ...(componentName !== undefined && { componentName }),
     ...(project !== undefined && { project }),

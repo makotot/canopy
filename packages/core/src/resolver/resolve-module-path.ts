@@ -28,10 +28,7 @@ function resolveAliasedBase(specifier: string, fromFilePath: string): string {
     (m) => specifier === m.prefix || specifier.startsWith(m.prefix + '/'),
   );
   if (matched) {
-    return path.resolve(
-      matched.target,
-      specifier.slice(matched.prefix.length).replace(/^\//, ''),
-    );
+    return path.resolve(matched.target, specifier.slice(matched.prefix.length).replace(/^\//, ''));
   }
   return path.resolve(process.cwd(), specifier.replace(/^@\//, ''));
 }
