@@ -41,7 +41,7 @@ describe('createAsyncAnnotator', () => {
       expected: true,
     },
   ])('$label', ({ fixture: f, get, expected }) => {
-    const { tree, sourceFilePath } = analyzeRenderTree(fixture(f), project);
+    const { tree, sourceFilePath } = analyzeRenderTree({ filePath: fixture(f), project });
     const annotator = createAsyncAnnotator(sourceFilePath, project);
     expect(get(annotator(tree))).toBe(expected);
   });

@@ -40,6 +40,18 @@ describe('run', () => {
     assert(output);
   });
 
+  it('outputs named export component when componentName is specified', () => {
+    let output = '';
+    run(fixture('named-export-component.tsx'), (s) => { output = s; }, project, 'Header');
+    expect(output).toContain('Header');
+  });
+
+  it('auto-detects named export when no default export', () => {
+    let output = '';
+    run(fixture('named-export-component.tsx'), (s) => { output = s; }, project);
+    expect(output).toContain('Header');
+  });
+
   it('throws for non-existent file', () => {
     expect(() => run('/nonexistent/page.tsx', () => {})).toThrow('File not found');
   });
