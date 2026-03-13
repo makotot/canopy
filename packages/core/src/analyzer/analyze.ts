@@ -1,6 +1,7 @@
 import { Project, Node, SyntaxKind, type SourceFile } from 'ts-morph';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { createProject } from '../create-project.js';
 import { getDefaultExportedFunction } from '../resolver/get-default-exported-function.js';
 import { parseJsxElement, parseSelfClosingElement, parseJsxChildren } from './parse-jsx-element.js';
 import { resolveNode } from './resolve-node.js';
@@ -22,13 +23,17 @@ export interface AnalyzeResult {
   sourceFilePath: string;
 }
 
-export function analyzeRenderTree(filePath: string): AnalyzeResult {
+// A shared Project can be passed in to avoid repeated initialization overhead.
+// This is safe because analysis is purely read-only: source files are only
+// parsed and traversed, never mutated. The only shared state is the SourceFile
+// cache, which ts-morph keys by absolute path — deterministic and side-effect-free.
+export function analyzeRenderTree(filePath: string, project?: Project): AnalyzeResult {
   const absolutePath = path.resolve(filePath);
   if (!fs.existsSync(absolutePath)) {
     throw new Error(`File not found: ${absolutePath}`);
   }
 
-  const project = new Project({ compilerOptions: { jsx: 4 } });
+  project ??= createProject();
   const sourceFile = project.addSourceFileAtPath(absolutePath);
 
   const funcNode = getDefaultExportedFunction(sourceFile);

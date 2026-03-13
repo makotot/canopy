@@ -20,9 +20,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@makotot/canopy-core": "workspace:*",
     "@makotot/canopy-annotator-async": "workspace:*",
+    "@makotot/canopy-core": "workspace:*",
     "@makotot/canopy-reporter-mermaid": "workspace:*",
     "cac": "7.0.0"
+  },
+  "devDependencies": {
+    "ts-morph": "27.0.2"
   }
 }

@@ -1,11 +1,16 @@
-import { describe, it, expect } from 'vitest';
-import { analyzeRenderTree, type TreeNode } from '@makotot/canopy-core';
+import { describe, it, expect, beforeAll } from 'vitest';
+import { type Project } from 'ts-morph';
+import { analyzeRenderTree, createProject, type TreeNode } from '@makotot/canopy-core';
 import { createAsyncAnnotator } from './index.js';
 
 const fixture = (name: string) =>
   new URL(`./__fixtures__/${name}`, import.meta.url).pathname;
 
 describe('createAsyncAnnotator', () => {
+  let project: Project;
+  beforeAll(() => {
+    project = createProject();
+  });
   it.each([
     {
       label: 'marks async component with meta.async: true',
@@ -36,7 +41,7 @@ describe('createAsyncAnnotator', () => {
       expected: true,
     },
   ])('$label', ({ fixture: f, get, expected }) => {
-    const { tree, project, sourceFilePath } = analyzeRenderTree(fixture(f));
+    const { tree, sourceFilePath } = analyzeRenderTree(fixture(f), project);
     const annotator = createAsyncAnnotator(sourceFilePath, project);
     expect(get(annotator(tree))).toBe(expected);
   });
