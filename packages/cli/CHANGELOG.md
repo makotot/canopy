@@ -1,5 +1,11 @@
 # @makotot/canopy-cli
 
+## 0.5.0
+
+### Minor Changes
+
+- 8b50430: Add -i / --interactive flag to the canopy command. When specified, the CLI prompts for the entry point file, component name, and annotators interactively instead of requiring them as arguments.
+
 ## 0.4.0
 
 ### Minor Changes
