@@ -13,7 +13,6 @@ Use the `@makotot/` scope.
 - `@makotot/canopy-annotator-suspense`
 - `@makotot/canopy-annotator-context`
 - `@makotot/canopy-annotator-portal`
-- `@makotot/canopy-annotator-external`
 - `@makotot/canopy-reporter-mermaid`
 - `@makotot/canopy-reporter-json`
 
