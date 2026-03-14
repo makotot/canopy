@@ -1,7 +1,11 @@
 import { analyzeRenderTree, createPipeline, type Out } from '@makotot/canopy-core';
 import { createMermaidReporter } from '@makotot/canopy-reporter-mermaid';
 import { type Project } from 'ts-morph';
-import { ANNOTATORS } from './annotators.js';
+import { ANNOTATORS, type AnnotatorName } from './annotators.js';
+
+function isAnnotatorName(name: string): name is AnnotatorName {
+  return name in ANNOTATORS;
+}
 
 export function run(
   filePath: string,
@@ -10,10 +14,12 @@ export function run(
   componentName?: string,
   annotatorNames: string[] = [],
 ): void {
+  const validatedNames: AnnotatorName[] = [];
   for (const name of annotatorNames) {
-    if (!(name in ANNOTATORS)) {
+    if (!isAnnotatorName(name)) {
       throw new Error(`Unknown annotator: ${name}`);
     }
+    validatedNames.push(name);
   }
   const {
     tree,
@@ -26,7 +32,7 @@ export function run(
   });
   createPipeline({
     build: () => tree,
-    annotators: annotatorNames.map((name) => ANNOTATORS[name]!(sourceFilePath, resolvedProject)),
+    annotators: validatedNames.map((name) => ANNOTATORS[name](sourceFilePath, resolvedProject)),
     reporter: createMermaidReporter(out),
   });
 }
