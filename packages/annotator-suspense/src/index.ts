@@ -39,7 +39,9 @@ function annotateNode(node: TreeNode, sourceFilePath: string, project: Project):
 
 function isSuspenseBoundary(component: string, sourceFilePath: string, project: Project): boolean {
   const sf = project.getSourceFile(sourceFilePath);
-  if (!sf) {return false;}
+  if (!sf) {
+    return false;
+  }
 
   if (component === 'Suspense') {
     return sf
@@ -53,11 +55,17 @@ function isSuspenseBoundary(component: string, sourceFilePath: string, project: 
 
   if (component === 'React.Suspense') {
     return sf.getImportDeclarations().some((decl) => {
-      if (decl.getModuleSpecifierValue() !== 'react') {return false;}
+      if (decl.getModuleSpecifierValue() !== 'react') {
+        return false;
+      }
       const defaultImport = decl.getDefaultImport();
-      if (defaultImport?.getText() === 'React') {return true;}
+      if (defaultImport?.getText() === 'React') {
+        return true;
+      }
       const namespaceImport = decl.getNamespaceImport();
-      if (namespaceImport?.getText() === 'React') {return true;}
+      if (namespaceImport?.getText() === 'React') {
+        return true;
+      }
       return false;
     });
   }
