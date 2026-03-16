@@ -78,6 +78,29 @@ describe('renderMermaid', () => {
   style n1 fill:#dbeafe,stroke:#93c5fd`,
     },
     {
+      label: 'props with JSX nodes render as labeled edges',
+      tree: {
+        component: 'Page',
+        children: [
+          {
+            component: 'Suspense',
+            children: [{ component: 'Content', children: [] }],
+            props: {
+              fallback: [{ component: 'Loading', children: [] }],
+            },
+          },
+        ],
+      } satisfies TreeNode,
+      expected: `flowchart TD
+  n0["Page"]
+  n1["Suspense"]
+  n2["Content"]
+  n3["Loading"]
+  n0 --> n1
+  n1 --> n2
+  n1 -->|fallback| n3`,
+    },
+    {
       label: 'meta.group with children wraps subtree in subgraph',
       tree: {
         component: 'Page',
