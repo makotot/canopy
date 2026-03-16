@@ -27,6 +27,8 @@ interface VisitOptions {
   inGroup: boolean;
   /** Indentation prefix for node definition lines. Increases inside subgraph blocks. */
   indent?: string;
+  /** Prop name when this node was passed as a named prop (e.g. `fallback`). */
+  propName?: string;
 }
 
 /** @internal */
@@ -39,6 +41,7 @@ function visit({
   counter,
   inGroup,
   indent = '  ',
+  propName,
 }: VisitOptions): void {
   const group = node.meta?.group as string | undefined;
   const style = node.meta?.style as { fill: string; stroke: string } | undefined;
@@ -46,7 +49,7 @@ function visit({
   const id = `n${counter.n++}`;
 
   if (parentId !== null) {
-    edgeDefs.push(`  ${parentId} ${buildEdge(node)} ${id}`);
+    edgeDefs.push(`  ${parentId} ${buildEdge(node, propName)} ${id}`);
   }
 
   nodeDefs.push(`${indent}${id}["${buildLabel(node)}"]`);
@@ -85,6 +88,24 @@ function visit({
       });
     }
   }
+
+  if (node.props) {
+    for (const [name, propNodes] of Object.entries(node.props)) {
+      for (const propNode of propNodes) {
+        visit({
+          node: propNode,
+          parentId: id,
+          nodeDefs,
+          edgeDefs,
+          styleDefs,
+          counter,
+          inGroup: !!group || inGroup,
+          indent,
+          propName: name,
+        });
+      }
+    }
+  }
 }
 
 /** @internal */
@@ -94,7 +115,10 @@ function buildLabel(node: TreeNode): string {
 }
 
 /** @internal */
-function buildEdge(node: TreeNode): string {
+function buildEdge(node: TreeNode, propName?: string): string {
+  if (propName) {
+    return `-->|${propName}|`;
+  }
   if (node.condition === 'ternary' && node.branch === 'consequent') {
     return '-->|? true|';
   }

@@ -142,6 +142,51 @@ describe('renderMermaid', () => {
   style n1 fill:#dbeafe,stroke:#93c5fd
   style n3 fill:#dbeafe,stroke:#93c5fd`,
     },
+    {
+      label: 'component in non-children prop renders with prop name edge label',
+      tree: {
+        component: 'Page',
+        children: [
+          {
+            component: 'Suspense',
+            props: { fallback: [{ component: 'Loading', children: [] }] },
+            children: [{ component: 'Content', children: [] }],
+          },
+        ],
+      } satisfies TreeNode,
+      expected: `flowchart TD
+  n0["Page"]
+  n1["Suspense"]
+  n2["Content"]
+  n3["Loading"]
+  n0 --> n1
+  n1 --> n2
+  n1 -->|fallback| n3`,
+    },
+    {
+      label: 'multiple non-children props each render with their prop name',
+      tree: {
+        component: 'Page',
+        children: [
+          {
+            component: 'Layout',
+            props: {
+              header: [{ component: 'Header', children: [] }],
+              footer: [{ component: 'Footer', children: [] }],
+            },
+            children: [],
+          },
+        ],
+      } satisfies TreeNode,
+      expected: `flowchart TD
+  n0["Page"]
+  n1["Layout"]
+  n2["Header"]
+  n3["Footer"]
+  n0 --> n1
+  n1 -->|header| n2
+  n1 -->|footer| n3`,
+    },
   ])('$label', ({ tree, expected }) => {
     expect(renderMermaid(tree)).toBe(expected);
   });
