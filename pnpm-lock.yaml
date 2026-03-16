@@ -54,6 +54,15 @@ importers:
         specifier: 27.0.2
         version: 27.0.2
 
+  packages/annotator-suspense:
+    dependencies:
+      '@makotot/canopy-core':
+        specifier: workspace:*
+        version: link:../core
+      ts-morph:
+        specifier: 27.0.2
+        version: 27.0.2
+
   packages/cli:
     dependencies:
       '@clack/prompts':
@@ -65,6 +74,9 @@ importers:
       '@makotot/canopy-annotator-client-boundary':
         specifier: workspace:*
         version: link:../annotator-client-boundary
+      '@makotot/canopy-annotator-suspense':
+        specifier: workspace:*
+        version: link:../annotator-suspense
       '@makotot/canopy-core':
         specifier: workspace:*
         version: link:../core

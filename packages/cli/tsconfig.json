@@ -6,6 +6,7 @@
       "@makotot/canopy-core": ["../core/src/index.ts"],
       "@makotot/canopy-annotator-async": ["../annotator-async/src/index.ts"],
       "@makotot/canopy-annotator-client-boundary": ["../annotator-client-boundary/src/index.ts"],
+      "@makotot/canopy-annotator-suspense": ["../annotator-suspense/src/index.ts"],
       "@makotot/canopy-reporter-mermaid": ["../reporter-mermaid/src/index.ts"]
     }
   },
