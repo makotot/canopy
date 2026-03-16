@@ -1,6 +1,6 @@
 {
   "name": "@makotot/canopy-annotator-suspense",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Canopy annotator — detects React Suspense boundaries",
   "license": "MIT",
   "repository": {
