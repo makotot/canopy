@@ -55,6 +55,7 @@ Annotators are opt-in via `--annotator`. Multiple flags can be combined.
 | `--annotator async`           | Marks `async` server components with `[async]`                                |
 | `--annotator client-boundary` | Marks RSC client boundary components with `[client]` and groups their subtree |
 | `--annotator suspense`        | Marks `<Suspense>` boundaries with `[Suspense]` and a yellow highlight        |
+| `--annotator context`         | Marks context providers and consumers with badges and cross-links             |
 
 ### Interactive mode
 
@@ -91,14 +92,15 @@ node packages/cli/dist/cli.js <file>
 
 ## Packages
 
-| Package                                                                             | Description                          |
-| ----------------------------------------------------------------------------------- | ------------------------------------ |
-| [`@makotot/canopy-cli`](./packages/cli)                                             | CLI entrypoint (`canopy` command)    |
-| [`@makotot/canopy-core`](./packages/core)                                           | Analyzer, pipeline, and shared types |
-| [`@makotot/canopy-annotator-async`](./packages/annotator-async)                     | Marks `async` server components      |
-| [`@makotot/canopy-annotator-client-boundary`](./packages/annotator-client-boundary) | Marks RSC client boundary components |
-| [`@makotot/canopy-annotator-suspense`](./packages/annotator-suspense)               | Marks React Suspense boundaries      |
-| [`@makotot/canopy-reporter-mermaid`](./packages/reporter-mermaid)                   | Renders Mermaid flowchart output     |
+| Package                                                                             | Description                                 |
+| ----------------------------------------------------------------------------------- | ------------------------------------------- |
+| [`@makotot/canopy-cli`](./packages/cli)                                             | CLI entrypoint (`canopy` command)           |
+| [`@makotot/canopy-core`](./packages/core)                                           | Analyzer, pipeline, and shared types        |
+| [`@makotot/canopy-annotator-async`](./packages/annotator-async)                     | Marks `async` server components             |
+| [`@makotot/canopy-annotator-client-boundary`](./packages/annotator-client-boundary) | Marks RSC client boundary components        |
+| [`@makotot/canopy-annotator-suspense`](./packages/annotator-suspense)               | Marks React Suspense boundaries             |
+| [`@makotot/canopy-annotator-context`](./packages/annotator-context)                 | Marks React Context providers and consumers |
+| [`@makotot/canopy-reporter-mermaid`](./packages/reporter-mermaid)                   | Renders Mermaid flowchart output            |
 
 ## Requirements
 
