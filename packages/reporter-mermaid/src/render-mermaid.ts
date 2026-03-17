@@ -5,10 +5,27 @@ export function renderMermaid(tree: TreeNode): string {
   const edgeDefs: string[] = [];
   const styleDefs: string[] = [];
   const counter = { n: 0 };
+  const linkIdMap = new Map<string, string>();
+  const pendingCrossLinks: Array<{ sourceId: string; targetId: string; label: string }> = [];
 
-  visit({ node: tree, parentId: null, nodeDefs, edgeDefs, styleDefs, counter, inGroup: false });
+  visit({
+    node: tree,
+    parentId: null,
+    nodeDefs,
+    edgeDefs,
+    styleDefs,
+    counter,
+    inGroup: false,
+    linkIdMap,
+    pendingCrossLinks,
+  });
 
-  return [`flowchart TD`, ...nodeDefs, ...edgeDefs, ...styleDefs].join('\n');
+  const crossEdgeDefs = pendingCrossLinks.flatMap(({ sourceId, targetId, label }) => {
+    const targetMermaidId = linkIdMap.get(targetId);
+    return targetMermaidId ? [`  ${sourceId} -.->|${label}| ${targetMermaidId}`] : [];
+  });
+
+  return [`flowchart TD`, ...nodeDefs, ...edgeDefs, ...crossEdgeDefs, ...styleDefs].join('\n');
 }
 
 interface VisitOptions {
@@ -25,6 +42,10 @@ interface VisitOptions {
   counter: { n: number };
   /** True when currently inside a subgraph block. Prevents nested subgraphs. */
   inGroup: boolean;
+  /** Maps meta.linkId values to Mermaid node IDs for cross-edge resolution. */
+  linkIdMap: Map<string, string>;
+  /** Accumulated cross-edge pairs to emit after all nodes are visited. */
+  pendingCrossLinks: Array<{ sourceId: string; targetId: string; label: string }>;
   /** Indentation prefix for node definition lines. Increases inside subgraph blocks. */
   indent?: string;
   /** Prop name when this node was passed as a JSX prop (not a child). */
@@ -40,6 +61,8 @@ function visit({
   styleDefs,
   counter,
   inGroup,
+  linkIdMap,
+  pendingCrossLinks,
   indent = '  ',
   propName,
 }: VisitOptions): void {
@@ -47,6 +70,20 @@ function visit({
   const style = node.meta?.style as { fill: string; stroke: string } | undefined;
   const openSubgraph = !!group && !inGroup && node.children.length > 0;
   const id = `n${counter.n++}`;
+
+  const linkId = node.meta?.linkId as string | undefined;
+  if (linkId) {
+    linkIdMap.set(linkId, id);
+  }
+
+  const crossLinks = node.meta?.crossLinks as
+    | Array<{ targetId: string; label: string }>
+    | undefined;
+  if (crossLinks) {
+    for (const { targetId, label } of crossLinks) {
+      pendingCrossLinks.push({ sourceId: id, targetId, label });
+    }
+  }
 
   if (parentId !== null) {
     edgeDefs.push(`  ${parentId} ${buildEdge(node, propName)} ${id}`);
@@ -70,6 +107,8 @@ function visit({
         styleDefs,
         counter,
         inGroup: true,
+        linkIdMap,
+        pendingCrossLinks,
         indent: '    ',
       });
     }
@@ -84,6 +123,8 @@ function visit({
         styleDefs,
         counter,
         inGroup: !!group || inGroup,
+        linkIdMap,
+        pendingCrossLinks,
         indent,
       });
     }
@@ -100,6 +141,8 @@ function visit({
           styleDefs,
           counter,
           inGroup: !!group || inGroup,
+          linkIdMap,
+          pendingCrossLinks,
           indent,
           propName: name,
         });
