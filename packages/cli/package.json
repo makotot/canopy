@@ -27,6 +27,7 @@
     "@makotot/canopy-annotator-async": "workspace:*",
     "@makotot/canopy-annotator-client-boundary": "workspace:*",
     "@makotot/canopy-annotator-suspense": "workspace:*",
+    "@makotot/canopy-annotator-context": "workspace:*",
     "@makotot/canopy-core": "workspace:*",
     "@makotot/canopy-reporter-mermaid": "workspace:*",
     "cac": "7.0.0"

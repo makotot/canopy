@@ -165,6 +165,100 @@ describe('renderMermaid', () => {
   style n1 fill:#dbeafe,stroke:#93c5fd
   style n3 fill:#dbeafe,stroke:#93c5fd`,
     },
+    {
+      label: 'meta.crossLinks emits dashed edge from provider to consumer',
+      tree: {
+        component: 'Page',
+        children: [
+          {
+            component: 'AuthProvider',
+            meta: {
+              badge: 'provides:AuthContext',
+              style: { fill: '#d1fae5', stroke: '#6ee7b7' },
+              crossLinks: [{ targetId: 'ctx-0', label: 'AuthContext' }],
+            },
+            children: [
+              {
+                component: 'UserMenu',
+                meta: {
+                  badge: 'consumes:AuthContext',
+                  style: { fill: '#ede9fe', stroke: '#c4b5fd' },
+                  linkId: 'ctx-0',
+                },
+                children: [],
+              },
+            ],
+          },
+        ],
+      } satisfies TreeNode,
+      expected: `flowchart TD
+  n0["Page"]
+  n1["AuthProvider [provides:AuthContext]"]
+  n2["UserMenu [consumes:AuthContext]"]
+  n0 --> n1
+  n1 --> n2
+  n1 -.->|AuthContext| n2
+  style n1 fill:#d1fae5,stroke:#6ee7b7
+  style n2 fill:#ede9fe,stroke:#c4b5fd`,
+    },
+    {
+      label: 'meta.crossLinks with no matching linkId emits nothing',
+      tree: {
+        component: 'Page',
+        children: [
+          {
+            component: 'AuthProvider',
+            meta: {
+              crossLinks: [{ targetId: 'ctx-missing', label: 'AuthContext' }],
+            },
+            children: [],
+          },
+        ],
+      } satisfies TreeNode,
+      expected: `flowchart TD
+  n0["Page"]
+  n1["AuthProvider"]
+  n0 --> n1`,
+    },
+    {
+      label: 'multiple consumers each get a cross-edge from the provider',
+      tree: {
+        component: 'Page',
+        children: [
+          {
+            component: 'AuthProvider',
+            meta: {
+              crossLinks: [
+                { targetId: 'ctx-0', label: 'AuthContext' },
+                { targetId: 'ctx-1', label: 'AuthContext' },
+              ],
+            },
+            children: [
+              {
+                component: 'UserMenu',
+                meta: { linkId: 'ctx-0' },
+                children: [],
+              },
+              {
+                component: 'ProfileBadge',
+                meta: { linkId: 'ctx-1' },
+                children: [],
+              },
+            ],
+          },
+        ],
+      } satisfies TreeNode,
+      expected: `flowchart TD
+  n0["Page"]
+  n1["AuthProvider"]
+  n2["UserMenu"]
+  n3["ProfileBadge"]
+  n0 --> n1
+  n1 --> n2
+  n1 --> n3
+  n1 -.->|AuthContext| n2
+  n1 -.->|AuthContext| n3`,
+    },
   ])('$label', ({ tree, expected }) => {
     expect(renderMermaid(tree)).toBe(expected);
   });
