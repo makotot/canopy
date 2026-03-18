@@ -4,6 +4,16 @@ Statically analyze React component render trees and visualize them as Mermaid fl
 
 <img src="demo/demo.gif" width="600" />
 
+## Why?
+
+As a codebase in React app grows, its component render tree becomes hard to reason. This is increasingly true in a world where AI agents can produce large amounts of code  quickly — the tree expands faster than any developer can track by reading source code.
+
+Canopy makes the render tree visible statically:
+
+- **Static analysis** — Works on source files directly. No build, no dev server needed.
+- **Boundary visibility** — Annotators surface patterns like async components, client boundaries, Suspense, and context that are easy to miss when reading code file by file.
+- **Shareable diagrams** — Outputs standard Mermaid, which renders natively in GitHub Markdown, making it easy to include in PRs or architecture docs.
+
 ## Usage
 
 ### As a dev dependency
