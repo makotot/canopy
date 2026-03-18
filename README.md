@@ -2,6 +2,8 @@
 
 Statically analyze React component render trees and visualize them as Mermaid flowcharts.
 
+<img src="demo/demo.gif" width="600" />
+
 ## Usage
 
 ### As a dev dependency
@@ -32,18 +34,69 @@ npx @makotot/canopy-cli app/page.tsx --annotator async --annotator client-bounda
 
 ```mermaid
 flowchart TD
-  n0["Page [async]"]
+  n0["Page"]
   n1["main"]
-  n2["LocalSearch [client]"]
-  subgraph sg3 ["client"]
-    n4["input"]
+  n2["Header"]
+  n3["header"]
+  n4["nav"]
+  n5["a"]
+  n6["UserMenu [client]"]
+  subgraph sg7 ["client"]
+    n8["div"]
+    n9["button"]
+    n10["button"]
   end
-  n5["ServerWidget"]
+  n11["section"]
+  n12["Stats [async]"]
+  n13["section"]
+  n14["div"]
+  n15["h2"]
+  n16["p"]
+  n17["div"]
+  n18["h2"]
+  n19["p"]
+  n20["Chart [client]"]
+  subgraph sg21 ["client"]
+    n22["div"]
+    n23["canvas"]
+  end
+  n24["ActivityFeed [async]"]
+  n25["aside"]
+  n26["h2"]
+  n27["ul"]
+  n28["li"]
+  n29["li"]
+  n30["li"]
   n0 --> n1
   n1 --> n2
-  n2 --> n4
-  n1 --> n5
-  style n2 fill:#dbeafe,stroke:#93c5fd
+  n2 --> n3
+  n3 --> n4
+  n4 --> n5
+  n3 --> n6
+  n6 --> n8
+  n8 --> n9
+  n8 --> n10
+  n1 --> n11
+  n11 --> n12
+  n12 --> n13
+  n13 --> n14
+  n14 --> n15
+  n14 --> n16
+  n13 --> n17
+  n17 --> n18
+  n17 --> n19
+  n11 --> n20
+  n20 --> n22
+  n22 --> n23
+  n1 --> n24
+  n24 --> n25
+  n25 --> n26
+  n25 --> n27
+  n27 --> n28
+  n27 --> n29
+  n27 --> n30
+  style n6 fill:#dbeafe,stroke:#93c5fd
+  style n20 fill:#dbeafe,stroke:#93c5fd
 ```
 
 ### Annotators
@@ -62,7 +115,7 @@ Annotators are opt-in via `--annotator`. Multiple flags can be combined.
 Run without arguments to launch an interactive prompt that guides you through selecting the entry point, component name, and annotators:
 
 ```sh
-canopy -i
+npx @makotot/canopy-cli --interactive
 ```
 
 ### Options
