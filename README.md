@@ -6,7 +6,7 @@ Statically analyze React component render trees and visualize them as Mermaid fl
 
 ## Why?
 
-As a codebase in React app grows, its component render tree becomes hard to reason. This is increasingly true in a world where AI agents can produce large amounts of code  quickly — the tree expands faster than any developer can track by reading source code.
+As a codebase in React app grows, its component render tree becomes hard to reason. This is increasingly true in a world where AI agents can produce large amounts of code quickly — the tree expands faster than any developer can track by reading source code.
 
 Canopy makes the render tree visible statically:
 
