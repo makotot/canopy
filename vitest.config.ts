@@ -19,6 +19,9 @@ export default defineConfig({
       '@makotot/canopy-annotator-context': fileURLToPath(
         new URL('./packages/annotator-context/src/index.ts', import.meta.url),
       ),
+      '@makotot/canopy-annotator-semantic': fileURLToPath(
+        new URL('./packages/annotator-semantic/src/index.ts', import.meta.url),
+      ),
       '@makotot/canopy-reporter-mermaid': fileURLToPath(
         new URL('./packages/reporter-mermaid/src/index.ts', import.meta.url),
       ),
