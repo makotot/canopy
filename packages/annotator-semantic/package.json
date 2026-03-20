@@ -27,5 +27,8 @@
   },
   "dependencies": {
     "@makotot/canopy-core": "workspace:*"
+  },
+  "devDependencies": {
+    "ts-morph": "27.0.2"
   }
 }

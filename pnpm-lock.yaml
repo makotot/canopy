@@ -68,6 +68,10 @@ importers:
       '@makotot/canopy-core':
         specifier: workspace:*
         version: link:../core
+    devDependencies:
+      ts-morph:
+        specifier: 27.0.2
+        version: 27.0.2
 
   packages/annotator-suspense:
     dependencies:
