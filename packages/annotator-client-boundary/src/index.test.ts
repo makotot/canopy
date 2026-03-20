@@ -25,41 +25,40 @@ describe('createClientBoundaryAnnotator', () => {
 
   it.each([
     {
-      label: 'marks ClientWidget (has "use client") with meta.client: true',
+      label: 'marks ClientWidget (has "use client") with "client" in meta.tags',
       fixture: 'page-with-client-and-server.tsx',
-      get: (tree: TreeNode) => tree.children[0]?.children[0]?.meta?.['client'],
+      get: (tree: TreeNode) =>
+        (tree.children[0]?.children[0]?.meta?.['tags'] as string[] | undefined)?.includes('client'),
       expected: true,
     },
     {
       label: 'does not mark ServerWidget (no "use client")',
       fixture: 'page-with-client-and-server.tsx',
-      get: (tree: TreeNode) => tree.children[0]?.children[1]?.meta?.['client'],
+      get: (tree: TreeNode) => tree.children[0]?.children[1]?.meta?.['tags'],
       expected: undefined,
     },
     {
       label: 'does not mark html element (main)',
       fixture: 'page-with-client-and-server.tsx',
-      get: (tree: TreeNode) => tree.children[0]?.meta?.['client'],
+      get: (tree: TreeNode) => tree.children[0]?.meta?.['tags'],
       expected: undefined,
     },
     {
-      label: 'marks ClientImportsShared (has "use client") with meta.client: true',
+      label: 'marks ClientImportsShared (has "use client") with "client" in meta.tags',
       fixture: 'page-with-transitive-client.tsx',
-      get: (tree: TreeNode) => tree.children[0]?.children[0]?.meta?.['client'],
+      get: (tree: TreeNode) =>
+        (tree.children[0]?.children[0]?.meta?.['tags'] as string[] | undefined)?.includes('client'),
       expected: true,
     },
     {
       label:
-        'marks SharedUtil (transitively imported by a "use client" file) with meta.client: true',
+        'marks SharedUtil (transitively imported by a "use client" file) with "client" in meta.tags',
       fixture: 'page-with-transitive-client.tsx',
-      get: (tree: TreeNode) => tree.children[0]?.children[0]?.children[0]?.meta?.['client'],
+      get: (tree: TreeNode) =>
+        (
+          tree.children[0]?.children[0]?.children[0]?.meta?.['tags'] as string[] | undefined
+        )?.includes('client'),
       expected: true,
-    },
-    {
-      label: 'sets meta.badge to "client" on client component',
-      fixture: 'page-with-client-and-server.tsx',
-      get: (tree: TreeNode) => tree.children[0]?.children[0]?.meta?.['badge'],
-      expected: 'client',
     },
     {
       label: 'sets meta.group to "client" on client component',
@@ -71,6 +70,17 @@ describe('createClientBoundaryAnnotator', () => {
     const { tree, sourceFilePath } = analyzeRenderTree({ filePath: fixture(f), project });
     const annotator = createClientBoundaryAnnotator(sourceFilePath, project);
     expect(get(annotator(tree))).toBe(expected);
+  });
+
+  it('sets meta.badge to ["⬡"] and meta.tags to ["client"] on client component', () => {
+    const { tree, sourceFilePath } = analyzeRenderTree({
+      filePath: fixture('page-with-client-and-server.tsx'),
+      project,
+    });
+    const annotator = createClientBoundaryAnnotator(sourceFilePath, project);
+    const meta = annotator(tree).children[0]?.children[0]?.meta;
+    expect(meta?.['badge']).toEqual(['⚡']);
+    expect(meta?.['tags']).toEqual(['client']);
   });
 
   it('sets meta.style with blue fill and stroke on client component', () => {

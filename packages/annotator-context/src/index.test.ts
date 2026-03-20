@@ -48,13 +48,13 @@ describe('createContextAnnotator', () => {
       {
         label: 'annotates direct <XxxContext.Provider> in JSX',
         fixture: 'page-with-direct-provider.tsx',
-        get: (tree: TreeNode) => tree.children[0]?.meta?.['contextBadges'],
+        get: (tree: TreeNode) => tree.children[0]?.meta?.['tags'],
         expected: ['provides:AuthContext'],
       },
       {
         label: 'annotates wrapper component that renders Provider internally',
         fixture: 'page-with-wrapper-provider.tsx',
-        get: (tree: TreeNode) => tree.children[0]?.meta?.['contextBadges'],
+        get: (tree: TreeNode) => tree.children[0]?.meta?.['tags'],
         expected: ['provides:AuthContext'],
       },
     ])('$label', ({ fixture: f, get, expected }) => {
@@ -69,19 +69,19 @@ describe('createContextAnnotator', () => {
       {
         label: 'annotates component with direct useContext call',
         fixture: 'page-with-direct-consumer.tsx',
-        get: (tree: TreeNode) => tree.children[0]?.children[0]?.meta?.['contextBadges'],
+        get: (tree: TreeNode) => tree.children[0]?.children[0]?.meta?.['tags'],
         expected: ['consumes:AuthContext'],
       },
       {
         label: 'annotates component with use() call',
         fixture: 'page-with-use-consumer.tsx',
-        get: (tree: TreeNode) => tree.children[0]?.children[0]?.meta?.['contextBadges'],
+        get: (tree: TreeNode) => tree.children[0]?.children[0]?.meta?.['tags'],
         expected: ['consumes:AuthContext'],
       },
       {
         label: 'annotates component consuming context via custom hook',
         fixture: 'page-with-custom-hook-consumer.tsx',
-        get: (tree: TreeNode) => tree.children[0]?.children[0]?.meta?.['contextBadges'],
+        get: (tree: TreeNode) => tree.children[0]?.children[0]?.meta?.['tags'],
         expected: ['consumes:AuthContext'],
       },
     ])('$label', ({ fixture: f, get, expected }) => {
@@ -92,13 +92,13 @@ describe('createContextAnnotator', () => {
   });
 
   describe('meta fields', () => {
-    it('sets meta.badge to first contextBadges entry on provider', () => {
+    it('sets meta.badge to ["▶◀"] on provider', () => {
       const { tree, sourceFilePath } = analyzeRenderTree({
         filePath: fixture('page-with-direct-provider.tsx'),
         project,
       });
       const annotator = createContextAnnotator(sourceFilePath, project);
-      expect(annotator(tree).children[0]?.meta?.['badge']).toBe('provides:AuthContext');
+      expect(annotator(tree).children[0]?.meta?.['badge']).toEqual(['◎']);
     });
 
     it('sets green style on provider', () => {
@@ -149,7 +149,7 @@ describe('createContextAnnotator', () => {
         project,
       });
       const annotator = createContextAnnotator(sourceFilePath, project);
-      expect(annotator(tree).children[0]?.children[0]?.meta?.['contextBadges']).toBeUndefined();
+      expect(annotator(tree).children[0]?.children[0]?.meta?.['tags']).toBeUndefined();
     });
   });
 

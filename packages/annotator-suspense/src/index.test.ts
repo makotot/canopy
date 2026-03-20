@@ -42,51 +42,64 @@ describe('createSuspenseAnnotator', () => {
 
   it.each([
     {
-      label: 'marks Suspense (named import) with meta.suspense: true',
+      label: 'marks Suspense (named import) with "suspense" in meta.tags',
       fixture: 'page-with-suspense.tsx',
-      get: (tree: TreeNode) => tree.children[0]?.children[0]?.meta?.['suspense'],
+      get: (tree: TreeNode) =>
+        (tree.children[0]?.children[0]?.meta?.['tags'] as string[] | undefined)?.includes(
+          'suspense',
+        ),
       expected: true,
     },
     {
-      label: 'marks React.Suspense (member expression) with meta.suspense: true',
+      label: 'marks React.Suspense (member expression) with "suspense" in meta.tags',
       fixture: 'page-with-react-suspense.tsx',
-      get: (tree: TreeNode) => tree.children[0]?.children[0]?.meta?.['suspense'],
+      get: (tree: TreeNode) =>
+        (tree.children[0]?.children[0]?.meta?.['tags'] as string[] | undefined)?.includes(
+          'suspense',
+        ),
       expected: true,
     },
     {
       label: 'does not mark children inside Suspense',
       fixture: 'page-with-suspense.tsx',
-      get: (tree: TreeNode) => tree.children[0]?.children[0]?.children[0]?.meta?.['suspense'],
+      get: (tree: TreeNode) => tree.children[0]?.children[0]?.children[0]?.meta?.['tags'],
       expected: undefined,
     },
     {
       label: 'does not mark html elements',
       fixture: 'page-with-suspense.tsx',
-      get: (tree: TreeNode) => tree.children[0]?.meta?.['suspense'],
+      get: (tree: TreeNode) => tree.children[0]?.meta?.['tags'],
       expected: undefined,
     },
     {
       label: 'marks both Suspense nodes in nested fixture',
       fixture: 'page-with-nested-suspense.tsx',
-      get: (tree: TreeNode) => tree.children[0]?.children[0]?.meta?.['suspense'],
+      get: (tree: TreeNode) =>
+        (tree.children[0]?.children[0]?.meta?.['tags'] as string[] | undefined)?.includes(
+          'suspense',
+        ),
       expected: true,
     },
     {
       label: 'marks second Suspense node in nested fixture',
       fixture: 'page-with-nested-suspense.tsx',
-      get: (tree: TreeNode) => tree.children[0]?.children[1]?.meta?.['suspense'],
+      get: (tree: TreeNode) =>
+        (tree.children[0]?.children[1]?.meta?.['tags'] as string[] | undefined)?.includes(
+          'suspense',
+        ),
       expected: true,
     },
     {
       label: 'marks Suspense when used directly as root child (fallback fixture)',
       fixture: 'page-with-suspense-fallback.tsx',
-      get: (tree: TreeNode) => tree.children[0]?.meta?.['suspense'],
+      get: (tree: TreeNode) =>
+        (tree.children[0]?.meta?.['tags'] as string[] | undefined)?.includes('suspense'),
       expected: true,
     },
     {
       label: 'does NOT mark local component named Suspense',
       fixture: 'page-with-local-suspense.tsx',
-      get: (tree: TreeNode) => tree.children[0]?.meta?.['suspense'],
+      get: (tree: TreeNode) => tree.children[0]?.meta?.['tags'],
       expected: undefined,
     },
   ])('$label', ({ fixture: f, get, expected }) => {
@@ -95,13 +108,15 @@ describe('createSuspenseAnnotator', () => {
     expect(get(annotator(tree))).toBe(expected);
   });
 
-  it('sets meta.badge to "Suspense" on Suspense boundary', () => {
+  it('sets meta.badge to ["⏳"] and meta.tags to ["suspense"] on Suspense boundary', () => {
     const { tree, sourceFilePath } = analyzeRenderTree({
       filePath: fixture('page-with-suspense.tsx'),
       project,
     });
     const annotator = createSuspenseAnnotator(sourceFilePath, project);
-    expect(annotator(tree).children[0]?.children[0]?.meta?.['badge']).toBe('Suspense');
+    const meta = annotator(tree).children[0]?.children[0]?.meta;
+    expect(meta?.['badge']).toEqual(['⏳']);
+    expect(meta?.['tags']).toEqual(['suspense']);
   });
 
   it('sets meta.style with yellow fill and stroke on Suspense boundary', () => {

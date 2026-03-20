@@ -22,14 +22,25 @@ describe('renderMermaid', () => {
   n0 --> n1`,
     },
     {
-      label: 'meta.badge renders as label suffix',
+      label: 'meta.badge renders as <br/> separated lines below component name',
       tree: {
         component: 'Page',
-        children: [{ component: 'AsyncData', meta: { badge: 'async' }, children: [] }],
+        children: [{ component: 'AsyncData', meta: { badge: ['↻'] }, children: [] }],
       } satisfies TreeNode,
       expected: `flowchart TD
   n0["Page"]
-  n1["AsyncData [async]"]
+  n1["AsyncData<br/>↻"]
+  n0 --> n1`,
+    },
+    {
+      label: 'multiple badges in meta.badge render as separate lines',
+      tree: {
+        component: 'Page',
+        children: [{ component: 'AsyncProvider', meta: { badge: ['↻', '◎'] }, children: [] }],
+      } satisfies TreeNode,
+      expected: `flowchart TD
+  n0["Page"]
+  n1["AsyncProvider<br/>↻<br/>◎"]
   n0 --> n1`,
     },
     {
@@ -66,14 +77,14 @@ describe('renderMermaid', () => {
         children: [
           {
             component: 'ClientWidget',
-            meta: { badge: 'client', style: { fill: '#dbeafe', stroke: '#93c5fd' } },
+            meta: { badge: ['⚡'], style: { fill: '#dbeafe', stroke: '#93c5fd' } },
             children: [],
           },
         ],
       } satisfies TreeNode,
       expected: `flowchart TD
   n0["Page"]
-  n1["ClientWidget [client]"]
+  n1["ClientWidget<br/>⚡"]
   n0 --> n1
   style n1 fill:#dbeafe,stroke:#93c5fd`,
     },
@@ -108,7 +119,7 @@ describe('renderMermaid', () => {
           {
             component: 'ClientWidget',
             meta: {
-              badge: 'client',
+              badge: ['⚡'],
               group: 'client',
               style: { fill: '#dbeafe', stroke: '#93c5fd' },
             },
@@ -118,7 +129,7 @@ describe('renderMermaid', () => {
       } satisfies TreeNode,
       expected: `flowchart TD
   n0["Page"]
-  n1["ClientWidget [client]"]
+  n1["ClientWidget<br/>⚡"]
   subgraph sg2 ["client"]
     n3["button"]
   end
@@ -134,7 +145,7 @@ describe('renderMermaid', () => {
           {
             component: 'ClientWidget',
             meta: {
-              badge: 'client',
+              badge: ['⚡'],
               group: 'client',
               style: { fill: '#dbeafe', stroke: '#93c5fd' },
             },
@@ -142,7 +153,7 @@ describe('renderMermaid', () => {
               {
                 component: 'InnerClient',
                 meta: {
-                  badge: 'client',
+                  badge: ['⚡'],
                   group: 'client',
                   style: { fill: '#dbeafe', stroke: '#93c5fd' },
                 },
@@ -154,9 +165,9 @@ describe('renderMermaid', () => {
       } satisfies TreeNode,
       expected: `flowchart TD
   n0["Page"]
-  n1["ClientWidget [client]"]
+  n1["ClientWidget<br/>⚡"]
   subgraph sg2 ["client"]
-    n3["InnerClient [client]"]
+    n3["InnerClient<br/>⚡"]
     n4["span"]
   end
   n0 --> n1
@@ -173,7 +184,7 @@ describe('renderMermaid', () => {
           {
             component: 'AuthProvider',
             meta: {
-              badge: 'provides:AuthContext',
+              badge: ['◎'],
               style: { fill: '#d1fae5', stroke: '#6ee7b7' },
               crossLinks: [{ targetId: 'ctx-0', label: 'AuthContext' }],
             },
@@ -181,7 +192,7 @@ describe('renderMermaid', () => {
               {
                 component: 'UserMenu',
                 meta: {
-                  badge: 'consumes:AuthContext',
+                  badge: ['◎'],
                   style: { fill: '#ede9fe', stroke: '#c4b5fd' },
                   linkId: 'ctx-0',
                 },
@@ -193,8 +204,8 @@ describe('renderMermaid', () => {
       } satisfies TreeNode,
       expected: `flowchart TD
   n0["Page"]
-  n1["AuthProvider [provides:AuthContext]"]
-  n2["UserMenu [consumes:AuthContext]"]
+  n1["AuthProvider<br/>◎"]
+  n2["UserMenu<br/>◎"]
   n0 --> n1
   n1 --> n2
   n1 -.->|AuthContext| n2

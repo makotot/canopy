@@ -101,7 +101,7 @@ describe('run', () => {
       undefined,
       ['async'],
     );
-    expect(output).toContain('[async]');
+    expect(output).toContain('<br/>↻');
   });
 
   it('throws for unknown annotator name', () => {

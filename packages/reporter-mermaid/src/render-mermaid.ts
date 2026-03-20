@@ -153,8 +153,10 @@ function visit({
 
 /** @internal */
 function buildLabel(node: TreeNode): string {
-  const badge = node.meta?.badge as string | undefined;
-  return badge ? `${node.component} [${badge}]` : node.component;
+  const badges = node.meta?.badge as string[] | undefined;
+  return badges && badges.length > 0
+    ? `${node.component}<br/>${badges.join('<br/>')}`
+    : node.component;
 }
 
 /** @internal */

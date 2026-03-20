@@ -50,14 +50,14 @@ flowchart TD
   n3["header"]
   n4["nav"]
   n5["a"]
-  n6["UserMenu [client]"]
+  n6["UserMenu<br/>⬡"]
   subgraph sg7 ["client"]
     n8["div"]
     n9["button"]
     n10["button"]
   end
   n11["section"]
-  n12["Stats [async]"]
+  n12["Stats<br/>⚡"]
   n13["section"]
   n14["div"]
   n15["h2"]
@@ -65,12 +65,12 @@ flowchart TD
   n17["div"]
   n18["h2"]
   n19["p"]
-  n20["Chart [client]"]
+  n20["Chart<br/>⬡"]
   subgraph sg21 ["client"]
     n22["div"]
     n23["canvas"]
   end
-  n24["ActivityFeed [async]"]
+  n24["ActivityFeed<br/>⚡"]
   n25["aside"]
   n26["h2"]
   n27["ul"]
@@ -113,12 +113,12 @@ flowchart TD
 
 Annotators are opt-in via `--annotator`. Multiple flags can be combined.
 
-| Flag                          | Description                                                                   |
-| ----------------------------- | ----------------------------------------------------------------------------- |
-| `--annotator async`           | Marks `async` server components with `[async]`                                |
-| `--annotator client-boundary` | Marks RSC client boundary components with `[client]` and groups their subtree |
-| `--annotator suspense`        | Marks `<Suspense>` boundaries with `[Suspense]` and a yellow highlight        |
-| `--annotator context`         | Marks context providers and consumers with badges and cross-links             |
+| Flag                          | Icon | Description                                                   |
+| ----------------------------- | ---- | ------------------------------------------------------------- |
+| `--annotator async`           | ↻    | Marks `async` server components                               |
+| `--annotator client-boundary` | ⚡   | Marks RSC client boundary components and groups their subtree |
+| `--annotator suspense`        | ⏳   | Marks `<Suspense>` boundaries with a yellow highlight         |
+| `--annotator context`         | ◎    | Marks context providers and consumers with cross-links        |
 
 ### Interactive mode
 
