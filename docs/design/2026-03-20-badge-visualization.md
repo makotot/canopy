@@ -41,6 +41,64 @@ Use a per-annotator icon as the visual marker. Each annotation occupies its own 
 | `annotator-context`         | ▶◀   | `▶◀`         | Icon alone is sufficient                 |
 | `annotator-semantic`        | ♿   | `♿ <role>`  | Icon + role name (role name is the info) |
 
+### Icon Candidates (under review)
+
+Emoji vs Unicode symbol: emoji rendering varies across Mermaid renderers and
+fonts. Unicode symbols (single-codepoint) are more consistent. Both columns are
+listed for comparison.
+
+#### `annotator-async`
+
+⚡ implies "fast / electricity", which conflicts with the actual semantics of
+async ("waiting for I/O"). Candidates:
+
+| Icon | Type    | Rationale                                      |
+| ---- | ------- | ---------------------------------------------- |
+| ⚡   | emoji   | **current** — widely recognized but misleading |
+| 🔄   | emoji   | "in progress / rotating" — I/O cycle           |
+| ⏸    | emoji   | "paused / suspended execution"                 |
+| ⚙    | emoji   | "background processing"                        |
+| ↻    | Unicode | single-codepoint loop arrow                    |
+
+#### `annotator-client-boundary`
+
+⬡ (white hexagon) has no inherent "client / browser" meaning. Candidates:
+
+| Icon | Type    | Rationale                                      |
+| ---- | ------- | ---------------------------------------------- |
+| ⬡    | Unicode | **current** — neutral, no clear association    |
+| 🖥   | emoji   | "runs in the browser / client device"          |
+| ◈    | Unicode | diamond with dot — "interactive / client-side" |
+| ⬢    | Unicode | filled hexagon — stronger presence than ⬡      |
+
+#### `annotator-suspense`
+
+⏳ is intuitive for "waiting". No strong reason to change. Candidates for
+reference:
+
+| Icon | Type    | Rationale                               |
+| ---- | ------- | --------------------------------------- |
+| ⏳   | emoji   | **current** — "loading / wait"          |
+| 🕐   | emoji   | clock — "waiting for time"              |
+| ◌    | Unicode | dotted circle — "pending / empty state" |
+
+#### `annotator-context`
+
+▶◀ is two codepoints and reads as "arrows closing in", which only loosely
+suggests "shared value flowing out". Candidates:
+
+| Icon | Type    | Rationale                                    |
+| ---- | ------- | -------------------------------------------- |
+| ▶◀   | Unicode | **current** — two codepoints, "converging"   |
+| ⊕    | Unicode | circled plus — "shared / injected value"     |
+| ◎    | Unicode | bullseye — "central value radiating outward" |
+| ⬭    | Unicode | white ellipse — neutral container            |
+
+#### `annotator-semantic`
+
+♿ is the established accessibility symbol (WCAG / WAI-ARIA). No strong
+alternative. Retain as-is unless a more specific ARIA icon emerges.
+
 ---
 
 ## Label Format
