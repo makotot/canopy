@@ -158,13 +158,13 @@ Expected Mermaid output:
 ```
 flowchart TD
   n0["Page"]
-  n1["div [generic]"]
-  n2["header [banner]"]
-  n3["nav [navigation]"]
-  n4["a [link]"]
-  n5["main [main]"]
-  n6["h1 [heading lv1]"]
-  n7["footer [contentinfo]"]
+  n1["div"]
+  n2["header<br/>♿ banner"]
+  n3["nav<br/>♿ navigation"]
+  n4["a<br/>♿ link"]
+  n5["main<br/>♿ main"]
+  n6["h1<br/>♿ heading lv1"]
+  n7["footer<br/>♿ contentinfo"]
   n0 --> n1
   n1 --> n2
   n2 --> n3
@@ -182,9 +182,13 @@ flowchart TD
 
 Key rendering behaviors:
 
-- The node label already contains the element name (e.g. `div`). The badge appends the ARIA role.
-- Green style for elements with a meaningful role. `generic`, `presentation`, and `none` receive only a badge with no style override.
-- React component nodes (`Page`) are not annotated and have no badge or style.
+- The annotation uses `♿` as an icon prefix followed by the ARIA role name, placed on a new line via `<br/>` (e.g. `header<br/>♿ banner`). The role name is kept as text because it is the actual semantic information.
+- `generic`, `presentation`, and `none` receive no annotation and no style override. The node label is the element name only (e.g. `div`).
+- React component nodes (`Page`) are not annotated.
+- When multiple annotators are active, each annotator's annotation occupies its own line:
+  ```
+  AsyncComponent<br/>⚡<br/>♿ banner
+  ```
 
 ---
 
