@@ -114,6 +114,52 @@ describe('analyzeRenderTree', () => {
     });
   });
 
+  describe('attrsToCollect', () => {
+    it('collects specified string attribute values into node.attrs', () => {
+      const result = analyzeRenderTree({
+        filePath: fixture('page-with-attrs.tsx'),
+        project,
+        attrsToCollect: ['role', 'type'],
+      });
+      // tree: Page > div > nav[role=navigation]
+      const nav = result.tree.children[0]?.children[0];
+      expect(nav?.component).toBe('nav');
+      expect(nav?.attrs).toEqual({ role: 'navigation' });
+    });
+
+    it('collects type attribute on input', () => {
+      const result = analyzeRenderTree({
+        filePath: fixture('page-with-attrs.tsx'),
+        project,
+        attrsToCollect: ['role', 'type'],
+      });
+      // tree: Page > div > input[type=email]
+      const input = result.tree.children[0]?.children[1];
+      expect(input?.component).toBe('input');
+      expect(input?.attrs).toEqual({ type: 'email' });
+    });
+
+    it('collects multiple attrs on same element', () => {
+      const result = analyzeRenderTree({
+        filePath: fixture('page-with-attrs.tsx'),
+        project,
+        attrsToCollect: ['role', 'type'],
+      });
+      // tree: Page > div > div[role=button]
+      const divBtn = result.tree.children[0]?.children[2];
+      expect(divBtn?.attrs).toEqual({ role: 'button' });
+    });
+
+    it('does not set attrs when attrsToCollect is not provided', () => {
+      const result = analyzeRenderTree({
+        filePath: fixture('page-with-attrs.tsx'),
+        project,
+      });
+      const nav = result.tree.children[0]?.children[0];
+      expect(nav?.attrs).toBeUndefined();
+    });
+  });
+
   describe('error handling', () => {
     it.each([
       {
