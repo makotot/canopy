@@ -1,0 +1,31 @@
+{
+  "name": "@makotot/canopy-annotator-semantic",
+  "version": "0.1.0",
+  "description": "Canopy annotator — annotates HTML elements with their ARIA role",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/makotot/canopy.git",
+    "directory": "packages/annotator-semantic"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@makotot/canopy-core": "workspace:*"
+  }
+}

@@ -11,6 +11,8 @@ export interface TreeNode {
   component: string;
   /** Metadata area freely used by annotators (e.g. badges) */
   meta?: Record<string, unknown>;
+  /** HTML attribute values collected by attrsToCollect (e.g. role, type) */
+  attrs?: Record<string, string>;
   condition?: 'ternary' | 'logical';
   branch?: 'consequent' | 'alternate';
   renderProp?: boolean;
@@ -46,12 +48,19 @@ export interface AnalyzeOptions {
    * cache, which ts-morph keys by absolute path — deterministic and side-effect-free.
    */
   project?: Project;
+  /**
+   * List of HTML attribute names whose string values should be collected into
+   * TreeNode.attrs. Annotators declare their needs via requiredAttrs; the CLI
+   * aggregates them before calling analyzeRenderTree.
+   */
+  attrsToCollect?: string[];
 }
 
 export function analyzeRenderTree({
   filePath,
   componentName,
   project,
+  attrsToCollect,
 }: AnalyzeOptions): AnalyzeResult {
   const absolutePath = path.resolve(filePath);
   if (!fs.existsSync(absolutePath)) {
@@ -71,8 +80,10 @@ export function analyzeRenderTree({
     : 'Anonymous';
 
   const visited = new Set<string>([`${absolutePath}::${resolvedComponentName}`]);
-  const shallowChildren = extractJsxFromFunc(funcNode, sourceFile);
-  const children = shallowChildren.map((c) => resolveNode(c, absolutePath, project, visited));
+  const shallowChildren = extractJsxFromFunc(funcNode, sourceFile, attrsToCollect);
+  const children = shallowChildren.map((c) =>
+    resolveNode(c, absolutePath, project, visited, attrsToCollect),
+  );
 
   return {
     tree: { component: resolvedComponentName, children },
@@ -103,7 +114,7 @@ function resolveFuncNode(sourceFile: SourceFile, componentName?: string) {
   return namedFuncs[0];
 }
 
-function extractJsxFromFunc(funcNode: Node, sourceFile: SourceFile) {
+function extractJsxFromFunc(funcNode: Node, sourceFile: SourceFile, attrsToCollect?: string[]) {
   for (const ret of funcNode.getDescendantsOfKind(SyntaxKind.ReturnStatement)) {
     const expr = ret.getExpression();
     if (!expr) {
@@ -111,13 +122,13 @@ function extractJsxFromFunc(funcNode: Node, sourceFile: SourceFile) {
     }
     const target = Node.isParenthesizedExpression(expr) ? expr.getExpression() : expr;
     if (Node.isJsxElement(target)) {
-      return [parseJsxElement(target, sourceFile)];
+      return [parseJsxElement(target, sourceFile, attrsToCollect)];
     }
     if (Node.isJsxSelfClosingElement(target)) {
-      return [parseSelfClosingElement(target, sourceFile)];
+      return [parseSelfClosingElement(target, sourceFile, attrsToCollect)];
     }
     if (Node.isJsxFragment(target)) {
-      return parseJsxChildren(target.getJsxChildren(), sourceFile);
+      return parseJsxChildren(target.getJsxChildren(), sourceFile, attrsToCollect);
     }
   }
   return [];

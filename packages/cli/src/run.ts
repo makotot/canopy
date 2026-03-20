@@ -15,6 +15,8 @@ export function run(
       throw new Error(`Unknown annotator: ${name}`);
     }
   }
+  const activeEntries = annotatorNames.map((name) => ANNOTATORS[name]!);
+  const attrsToCollect = activeEntries.flatMap((e) => e.requiredAttrs ?? []);
   const {
     tree,
     project: resolvedProject,
@@ -23,10 +25,11 @@ export function run(
     filePath,
     ...(componentName !== undefined && { componentName }),
     ...(project !== undefined && { project }),
+    ...(attrsToCollect.length > 0 && { attrsToCollect }),
   });
   createPipeline({
     build: () => tree,
-    annotators: annotatorNames.map((name) => ANNOTATORS[name]!(sourceFilePath, resolvedProject)),
+    annotators: activeEntries.map((e) => e.create(sourceFilePath, resolvedProject)),
     reporter: createMermaidReporter(out),
   });
 }

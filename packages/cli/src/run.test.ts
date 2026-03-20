@@ -109,4 +109,19 @@ describe('run', () => {
       run(fixture('simple-page.tsx'), () => {}, project, undefined, ['unknown-annotator']),
     ).toThrow('Unknown annotator: unknown-annotator');
   });
+
+  it('annotates with --annotator semantic', () => {
+    let output = '';
+    run(
+      asyncFixture('page-with-async.tsx'),
+      (s) => {
+        output = s;
+      },
+      project,
+      undefined,
+      ['semantic'],
+    );
+    // main element should have [main] badge from semantic annotator
+    expect(output).toContain('[main]');
+  });
 });
