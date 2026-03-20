@@ -1,4 +1,10 @@
-import { resolveComponent, type Annotator, type TreeNode } from '@makotot/canopy-core';
+import {
+  resolveComponent,
+  appendBadge,
+  appendTag,
+  type Annotator,
+  type TreeNode,
+} from '@makotot/canopy-core';
 import { Node, type Project } from 'ts-morph';
 
 export function createAsyncAnnotator(
@@ -13,7 +19,11 @@ function annotateNode(node: TreeNode, sourceFilePath: string, project: Project):
   const children = node.children.map((child) => annotateNode(child, sourceFilePath, project));
   return {
     ...node,
-    ...(isAsync ? { meta: { ...node.meta, async: true, badge: 'async' } } : {}),
+    ...(isAsync
+      ? {
+          meta: { ...node.meta, ...appendTag(node.meta, 'async'), ...appendBadge(node.meta, '↻') },
+        }
+      : {}),
     children,
     ...(node.props
       ? {

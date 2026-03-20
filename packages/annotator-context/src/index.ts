@@ -2,6 +2,7 @@ import {
   resolveComponent,
   resolveModulePath,
   getNamedExportedFunction,
+  appendBadge,
   type Annotator,
   type TreeNode,
 } from '@makotot/canopy-core';
@@ -47,37 +48,37 @@ function annotateNode(
       )
     : undefined;
 
-  const contextBadges: string[] = [];
+  const newTags: string[] = [];
 
   if (node.component.endsWith('.Provider')) {
-    contextBadges.push(`provides:${node.component.slice(0, -'.Provider'.length)}`);
+    newTags.push(`provides:${node.component.slice(0, -'.Provider'.length)}`);
   } else if (node.component.endsWith('.Consumer')) {
-    contextBadges.push(`consumes:${node.component.slice(0, -'.Consumer'.length)}`);
+    newTags.push(`consumes:${node.component.slice(0, -'.Consumer'.length)}`);
   }
 
   if (funcNode) {
     const funcFilePath = funcNode.getSourceFile().getFilePath();
     for (const ctx of findProvidedContexts(funcNode)) {
-      const badge = `provides:${ctx}`;
-      if (!contextBadges.includes(badge)) {
-        contextBadges.push(badge);
+      const tag = `provides:${ctx}`;
+      if (!newTags.includes(tag)) {
+        newTags.push(tag);
       }
     }
     for (const ctx of findConsumedContexts(funcNode, funcFilePath, project, new Set(), hookCache)) {
-      const badge = `consumes:${ctx}`;
-      if (!contextBadges.includes(badge)) {
-        contextBadges.push(badge);
+      const tag = `consumes:${ctx}`;
+      if (!newTags.includes(tag)) {
+        newTags.push(tag);
       }
     }
   }
 
-  if (contextBadges.length === 0) {
+  if (newTags.length === 0) {
     return { ...node, children, ...(props ? { props } : {}) };
   }
 
-  const hasProvides = contextBadges.some((b) => b.startsWith('provides:'));
-  const hasConsumes = contextBadges.some((b) => b.startsWith('consumes:'));
-  const badge = contextBadges[0];
+  const hasProvides = newTags.some((t) => t.startsWith('provides:'));
+  const hasConsumes = newTags.some((t) => t.startsWith('consumes:'));
+  const existingTags = (node.meta?.tags as string[] | undefined) ?? [];
   const style = hasProvides ? PROVIDER_STYLE : CONSUMER_STYLE;
   const linkId = hasConsumes ? genId() : undefined;
 
@@ -85,8 +86,8 @@ function annotateNode(
     ...node,
     meta: {
       ...node.meta,
-      contextBadges,
-      badge,
+      ...appendBadge(node.meta, '◎'),
+      tags: [...existingTags, ...newTags],
       style,
       ...(linkId ? { linkId } : {}),
     },
@@ -100,13 +101,13 @@ function resolveCrossLinks(tree: TreeNode): TreeNode {
   const providerStack = new Map<string, TreeNode[]>();
 
   function collect(node: TreeNode): void {
-    const contextBadges = (node.meta?.contextBadges as string[] | undefined) ?? [];
-    const provides = contextBadges
-      .filter((b) => b.startsWith('provides:'))
-      .map((b) => b.slice('provides:'.length));
-    const consumes = contextBadges
-      .filter((b) => b.startsWith('consumes:'))
-      .map((b) => b.slice('consumes:'.length));
+    const tags = (node.meta?.tags as string[] | undefined) ?? [];
+    const provides = tags
+      .filter((t) => t.startsWith('provides:'))
+      .map((t) => t.slice('provides:'.length));
+    const consumes = tags
+      .filter((t) => t.startsWith('consumes:'))
+      .map((t) => t.slice('consumes:'.length));
 
     for (const ctx of provides) {
       const stack = providerStack.get(ctx) ?? [];

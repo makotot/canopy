@@ -1,4 +1,4 @@
-import { type Annotator, type TreeNode } from '@makotot/canopy-core';
+import { appendBadge, appendTag, type Annotator, type TreeNode } from '@makotot/canopy-core';
 import { type Project } from 'ts-morph';
 
 export function createSuspenseAnnotator(
@@ -17,8 +17,8 @@ function annotateNode(node: TreeNode, sourceFilePath: string, project: Project):
       ? {
           meta: {
             ...node.meta,
-            suspense: true,
-            badge: 'Suspense',
+            ...appendTag(node.meta, 'suspense'),
+            ...appendBadge(node.meta, '⏳'),
             style: { fill: '#fef9c3', stroke: '#fde047' },
           },
         }

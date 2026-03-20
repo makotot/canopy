@@ -1,6 +1,8 @@
 import {
   resolveComponent,
   resolveModulePath,
+  appendBadge,
+  appendTag,
   type Annotator,
   type TreeNode,
 } from '@makotot/canopy-core';
@@ -36,8 +38,8 @@ function annotateNode(
       ? {
           meta: {
             ...node.meta,
-            client: true,
-            badge: 'client',
+            ...appendTag(node.meta, 'client'),
+            ...appendBadge(node.meta, '⚡'),
             group: 'client',
             style: { fill: '#dbeafe', stroke: '#93c5fd' },
           },
