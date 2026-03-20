@@ -83,25 +83,288 @@ For `annotator-semantic`, `generic`, `presentation`, and `none` are treated as n
 
 ### async only
 
+Input:
+
+```tsx
+export default async function Page() {
+  return (
+    <main>
+      <UserList />
+      <Sidebar />
+    </main>
+  );
+}
+
+async function UserList() {
+  return <ul />;
+}
+
+function Sidebar() {
+  return <aside />;
+}
 ```
+
+Output:
+
+```mermaid
+flowchart TD
+  n0["Page<br/>⚡"]
+  n1["main"]
+  n2["UserList<br/>⚡"]
+  n3["ul"]
+  n4["Sidebar"]
+  n5["aside"]
+  n0 --> n1
+  n1 --> n2
+  n1 --> n4
+  n2 --> n3
+  n4 --> n5
+```
+
+---
+
+### client-boundary only
+
+Input:
+
+```tsx
+'use client';
+export function Counter() {
+  return (
+    <div>
+      <button>+</button>
+    </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <main>
+      <Counter />
+    </main>
+  );
+}
+```
+
+Output:
+
+```mermaid
 flowchart TD
   n0["Page"]
-  n1["DataFetcher<br/>⚡"]
+  n1["main"]
+  subgraph sg0 ["client"]
+    n2["Counter<br/>⬡"]
+    n3["div"]
+    n4["button"]
+  end
   n0 --> n1
+  n1 --> n2
+  n2 --> n3
+  n3 --> n4
+  style n2 fill:#dbeafe,stroke:#93c5fd
 ```
 
-### async + semantic
+---
 
+### suspense only
+
+Input:
+
+```tsx
+import { Suspense } from 'react';
+
+export default function Page() {
+  return (
+    <main>
+      <Suspense fallback={<Loading />}>
+        <Feed />
+      </Suspense>
+    </main>
+  );
+}
+
+function Feed() {
+  return <ul />;
+}
+
+function Loading() {
+  return <p />;
+}
 ```
+
+Output:
+
+```mermaid
+flowchart TD
+  n0["Page"]
+  n1["main"]
+  n2["Suspense<br/>⏳"]
+  n3["Feed"]
+  n4["ul"]
+  n5["Loading"]
+  n6["p"]
+  n0 --> n1
+  n1 --> n2
+  n2 --> n3
+  n2 --> n5
+  n3 --> n4
+  n5 --> n6
+  style n2 fill:#fef9c3,stroke:#fde047
+```
+
+---
+
+### context only
+
+Input:
+
+```tsx
+import { createContext, useContext } from 'react';
+
+const ThemeContext = createContext('light');
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  return <ThemeContext.Provider value="dark">{children}</ThemeContext.Provider>;
+}
+
+export function ThemedButton() {
+  const theme = useContext(ThemeContext);
+  return <button>{theme}</button>;
+}
+
+export default function Page() {
+  return (
+    <ThemeProvider>
+      <ThemedButton />
+    </ThemeProvider>
+  );
+}
+```
+
+Output:
+
+```mermaid
+flowchart TD
+  n0["Page"]
+  n1["ThemeProvider<br/>▶◀"]
+  n2["ThemedButton<br/>▶◀"]
+  n3["button"]
+  n0 --> n1
+  n1 --> n2
+  n2 --> n3
+  n1 -.->|ThemeContext| n2
+  style n1 fill:#d1fae5,stroke:#6ee7b7
+  style n2 fill:#ede9fe,stroke:#c4b5fd
+```
+
+---
+
+### semantic only
+
+Input:
+
+```tsx
+export default function Page() {
+  return (
+    <div>
+      <header>
+        <nav>
+          <a href="/">Home</a>
+        </nav>
+      </header>
+      <main>
+        <h1>Title</h1>
+        <p>Body text.</p>
+      </main>
+      <footer>Footer</footer>
+    </div>
+  );
+}
+```
+
+Output:
+
+```mermaid
 flowchart TD
   n0["Page"]
   n1["div"]
   n2["header<br/>♿ banner"]
-  n3["AsyncNav<br/>⚡<br/>♿ navigation"]
+  n3["nav<br/>♿ navigation"]
+  n4["a<br/>♿ link"]
+  n5["main<br/>♿ main"]
+  n6["h1<br/>♿ heading lv1"]
+  n7["p<br/>♿ paragraph"]
+  n8["footer<br/>♿ contentinfo"]
   n0 --> n1
   n1 --> n2
+  n1 --> n5
+  n1 --> n8
   n2 --> n3
-  style n1 fill:#...
+  n3 --> n4
+  n5 --> n6
+  n5 --> n7
+  style n2 fill:#dcfce7,stroke:#86efac
+  style n3 fill:#dcfce7,stroke:#86efac
+  style n4 fill:#dcfce7,stroke:#86efac
+  style n5 fill:#dcfce7,stroke:#86efac
+  style n6 fill:#dcfce7,stroke:#86efac
+  style n7 fill:#dcfce7,stroke:#86efac
+  style n8 fill:#dcfce7,stroke:#86efac
+```
+
+---
+
+### async + semantic (multiple annotators on one node)
+
+Input:
+
+```tsx
+export default async function Page() {
+  return (
+    <div>
+      <header>
+        <AsyncNav />
+      </header>
+      <main>
+        <h1>Title</h1>
+      </main>
+    </div>
+  );
+}
+
+async function AsyncNav() {
+  return (
+    <nav>
+      <a href="/">Home</a>
+    </nav>
+  );
+}
+```
+
+Output:
+
+```mermaid
+flowchart TD
+  n0["Page<br/>⚡"]
+  n1["div"]
+  n2["header<br/>♿ banner"]
+  n3["AsyncNav<br/>⚡"]
+  n4["nav<br/>♿ navigation"]
+  n5["a<br/>♿ link"]
+  n6["main<br/>♿ main"]
+  n7["h1<br/>♿ heading lv1"]
+  n0 --> n1
+  n1 --> n2
+  n1 --> n6
+  n2 --> n3
+  n3 --> n4
+  n4 --> n5
+  n6 --> n7
+  style n2 fill:#dcfce7,stroke:#86efac
+  style n4 fill:#dcfce7,stroke:#86efac
+  style n5 fill:#dcfce7,stroke:#86efac
+  style n6 fill:#dcfce7,stroke:#86efac
+  style n7 fill:#dcfce7,stroke:#86efac
 ```
 
 ---
