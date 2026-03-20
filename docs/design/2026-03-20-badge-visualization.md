@@ -369,6 +369,34 @@ flowchart TD
 
 ---
 
+## Output Format and Consumers
+
+Mermaid output is designed for **human consumption** — rendered as a diagram in a browser or Markdown preview.
+
+When feeding canopy output to an **AI agent**, use `@makotot/canopy-reporter-json` instead. Mermaid text requires the agent to re-derive the tree structure from opaque IDs (`n0`, `n1`, …) and edge lines, which increases parsing cost and error risk. The JSON reporter preserves the component tree as-is:
+
+```json
+{
+  "component": "Page",
+  "meta": { "async": true },
+  "children": [
+    {
+      "component": "UserList",
+      "meta": { "async": true },
+      "children": []
+    }
+  ]
+}
+```
+
+| Consumer              | Recommended reporter |
+| --------------------- | -------------------- |
+| Human (visual review) | `reporter-mermaid`   |
+| AI agent              | `reporter-json`      |
+| CI diff / snapshot    | Either               |
+
+---
+
 ## Changes Required
 
 ### `reporter-mermaid`
