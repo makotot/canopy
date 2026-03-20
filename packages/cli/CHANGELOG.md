@@ -1,5 +1,17 @@
 # @makotot/canopy-cli
 
+## 0.7.1
+
+### Patch Changes
+
+- Updated dependencies [c16da94]
+  - @makotot/canopy-core@0.4.0
+  - @makotot/canopy-reporter-mermaid@0.4.0
+  - @makotot/canopy-annotator-async@0.5.0
+  - @makotot/canopy-annotator-client-boundary@0.3.0
+  - @makotot/canopy-annotator-suspense@0.3.0
+  - @makotot/canopy-annotator-context@0.3.0
+
 ## 0.7.0
 
 ### Minor Changes
