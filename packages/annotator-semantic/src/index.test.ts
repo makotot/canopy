@@ -17,10 +17,14 @@ function analyze(fixtureName: string, project: Project) {
 }
 
 function findByComponent(tree: TreeNode, component: string): TreeNode | undefined {
-  if (tree.component === component) return tree;
+  if (tree.component === component) {
+    return tree;
+  }
   for (const child of tree.children) {
     const found = findByComponent(child, component);
-    if (found) return found;
+    if (found) {
+      return found;
+    }
   }
   return undefined;
 }
@@ -146,7 +150,6 @@ describe('createSemanticAnnotator', () => {
       { type: 'image', badge: 'button' },
     ])('input[type=$type] → badge=$badge, green style', ({ type, badge }) => {
       const tree = analyze('page-with-form.tsx', project);
-      const node = tree.children[0]?.children[0]?.children[0];
       // find input with matching type
       const input = findInputByType(tree, type);
       expect(input?.meta?.['badge']).toBe(badge);
@@ -266,19 +269,27 @@ describe('createSemanticAnnotator', () => {
 });
 
 function findInputByType(tree: TreeNode, type: string): TreeNode | undefined {
-  if (tree.component === 'input' && tree.attrs?.['type'] === type) return tree;
+  if (tree.component === 'input' && tree.attrs?.['type'] === type) {
+    return tree;
+  }
   for (const child of tree.children) {
     const found = findInputByType(child, type);
-    if (found) return found;
+    if (found) {
+      return found;
+    }
   }
   return undefined;
 }
 
 function findInputWithoutType(tree: TreeNode): TreeNode | undefined {
-  if (tree.component === 'input' && !tree.attrs?.['type']) return tree;
+  if (tree.component === 'input' && !tree.attrs?.['type']) {
+    return tree;
+  }
   for (const child of tree.children) {
     const found = findInputWithoutType(child);
-    if (found) return found;
+    if (found) {
+      return found;
+    }
   }
   return undefined;
 }

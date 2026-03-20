@@ -87,15 +87,21 @@ function extractJsxProps(element: JsxElement | JsxSelfClosingElement, sourceFile
 }
 
 function attrsEntry(element: JsxElement | JsxSelfClosingElement, attrsToCollect?: string[]) {
-  if (!attrsToCollect || attrsToCollect.length === 0) return {};
+  if (!attrsToCollect || attrsToCollect.length === 0) {
+    return {};
+  }
   const attributes = Node.isJsxElement(element)
     ? element.getOpeningElement().getAttributes()
     : element.getAttributes();
   const attrs: Record<string, string> = {};
   for (const attr of attributes) {
-    if (!Node.isJsxAttribute(attr)) continue;
+    if (!Node.isJsxAttribute(attr)) {
+      continue;
+    }
     const name = attr.getNameNode().getText();
-    if (!attrsToCollect.includes(name)) continue;
+    if (!attrsToCollect.includes(name)) {
+      continue;
+    }
     const initializer = attr.getInitializer();
     if (Node.isStringLiteral(initializer)) {
       attrs[name] = initializer.getLiteralValue();
