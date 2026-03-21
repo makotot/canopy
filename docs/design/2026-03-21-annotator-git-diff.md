@@ -112,11 +112,42 @@ git diff --name-only main | canopy src/app/page.tsx --annotator git-diff --annot
 
 No new CLI options are added. The `--annotator` flag remains the only entry point.
 
-### `cli.ts` — no change required
+### `cli.ts` change (action handler only, no new options)
 
-The existing `--annotator` option is sufficient. No `--git-ref` option is added.
+The existing `--annotator` option is sufficient. No new flags are added. Only the action handler changes to read stdin and pass `changedFiles` to `run`.
+
+`git-diff` requires external state (`changedFiles`) that other annotators do not. Therefore it is **not** registered in `ANNOTATORS` and is handled explicitly in `run.ts`. This is the necessary exception to the registry pattern.
+
+Because `git diff --name-only` outputs paths relative to the **git repository root** (not `cwd`), the CLI resolves the repo root via `git rev-parse --show-toplevel` and converts each path to absolute. This ensures correct matching regardless of which directory `canopy` is invoked from, including monorepos. The `git rev-parse` call runs **only** when `--annotator git-diff` is present.
+
+If `--annotator git-diff` is specified but stdin is a TTY (no pipe), the CLI emits a warning to stderr and proceeds with `changedFiles: []` — no components will be annotated.
+
+```ts
+// cli.ts action handler
+const annotatorNames = options.annotator ?? [];
+let changedFiles: string[] = [];
+
+if (annotatorNames.includes('git-diff')) {
+  if (process.stdin.isTTY) {
+    process.stderr.write(
+      'warning: --annotator git-diff requires piped input, e.g.: git diff --name-only HEAD | canopy ...\n',
+    );
+  } else {
+    const repoRoot = execSync('git rev-parse --show-toplevel').toString().trim();
+    changedFiles = fs
+      .readFileSync('/dev/stdin', 'utf8')
+      .split('\n')
+      .filter(Boolean)
+      .map((f) => path.resolve(repoRoot, f));
+  }
+}
+
+run(file, console.log, undefined, options.component, annotatorNames, changedFiles);
+```
 
 ### `run.ts` change
+
+`git-diff` is handled outside the `ANNOTATORS` registry because its factory requires `changedFiles`, which is external data unavailable at registry definition time. The `changedFiles` parameter conveys this data; it is only used when `'git-diff'` appears in `annotatorNames`.
 
 ```ts
 export function run(
@@ -125,35 +156,24 @@ export function run(
   project?: Project,
   componentName?: string,
   annotatorNames: string[] = [],
-  stdinLines: string[] = [],
+  changedFiles: string[] = [],
 ): void {
+  for (const name of annotatorNames) {
+    if (name !== 'git-diff' && !(name in ANNOTATORS)) {
+      throw new Error(`Unknown annotator: ${name}`);
+    }
+  }
   const { tree, project: resolvedProject, sourceFilePath } = analyzeRenderTree({ ... });
 
   const annotators = annotatorNames.map((name) => {
     if (name === 'git-diff') {
-      return createGitDiffAnnotator(stdinLines)(sourceFilePath, resolvedProject);
+      return createGitDiffAnnotator(changedFiles)(sourceFilePath, resolvedProject);
     }
-    return ANNOTATORS[name](sourceFilePath, resolvedProject);
+    return ANNOTATORS[name]!(sourceFilePath, resolvedProject);
   });
 
   createPipeline({ build: () => tree, annotators, reporter: createMermaidReporter(out) });
 }
-```
-
-`stdinLines` is read and normalized by the CLI entry point before calling `run`. Because `git diff --name-only` always outputs paths relative to the **git repository root** (not `cwd`), the CLI resolves the repo root via `git rev-parse --show-toplevel` and converts each path to absolute before passing it to the annotator. This ensures correct matching regardless of which directory the user invokes `canopy` from, including monorepos where `cwd` is a package subdirectory.
-
-```ts
-// cli.ts action handler
-const repoRoot = execSync('git rev-parse --show-toplevel').toString().trim();
-const stdinLines = process.stdin.isTTY
-  ? []
-  : fs
-      .readFileSync('/dev/stdin', 'utf8')
-      .split('\n')
-      .filter(Boolean)
-      .map((f) => path.resolve(repoRoot, f));
-
-run(file, console.log, undefined, options.component, options.annotator ?? [], stdinLines);
 ```
 
 ---
@@ -237,54 +257,66 @@ All fixtures live under `src/__fixtures__/`.
 
 ## Test Case Plan
 
+`changedFiles` must be absolute paths (matching the Public API contract). Tests resolve fixture paths via `import.meta.url`, consistent with other annotator test suites.
+
 ```ts
+const fixture = (name: string) =>
+  new URL(`../__fixtures__/${name}`, import.meta.url).pathname;
+
 it.each([
   {
     label: 'marks component whose source file is in changedFiles',
     fixture: 'page-with-changed-and-unchanged',
-    changedFiles: ['src/__fixtures__/changed-widget.tsx'],
+    changedFiles: () => [fixture('changed-widget.tsx')],
     get: (tree) => findNode(tree, 'ChangedWidget')?.meta?.tags?.includes('git-changed'),
     expected: true,
   },
   {
     label: 'sets ⎇ badge on changed component',
     fixture: 'page-with-changed-and-unchanged',
-    changedFiles: ['src/__fixtures__/changed-widget.tsx'],
+    changedFiles: () => [fixture('changed-widget.tsx')],
     get: (tree) => findNode(tree, 'ChangedWidget')?.meta?.badge,
     expected: '⎇',
   },
   {
     label: 'sets amber style on changed component',
     fixture: 'page-with-changed-and-unchanged',
-    changedFiles: ['src/__fixtures__/changed-widget.tsx'],
+    changedFiles: () => [fixture('changed-widget.tsx')],
     get: (tree) => findNode(tree, 'ChangedWidget')?.meta?.style,
     expected: { fill: '#fef3c7', stroke: '#f59e0b' },
   },
   {
     label: 'does not mark component not in changedFiles',
     fixture: 'page-with-changed-and-unchanged',
-    changedFiles: ['src/__fixtures__/changed-widget.tsx'],
+    changedFiles: () => [fixture('changed-widget.tsx')],
     get: (tree) => findNode(tree, 'UnchangedWidget')?.meta?.tags?.includes('git-changed'),
     expected: undefined,
   },
   {
     label: 'does not mark HTML intrinsic elements',
     fixture: 'page-with-changed-and-unchanged',
-    changedFiles: ['src/__fixtures__/changed-widget.tsx'],
+    changedFiles: () => [fixture('changed-widget.tsx')],
     get: (tree) => findNode(tree, 'main')?.meta?.tags?.includes('git-changed'),
     expected: undefined,
   },
   {
     label: 'marks nested changed component',
     fixture: 'page-with-nested-changed',
-    changedFiles: ['src/__fixtures__/changed-widget.tsx'],
+    changedFiles: () => [fixture('changed-widget.tsx')],
     get: (tree) => findNode(tree, 'ChangedWidget')?.meta?.tags?.includes('git-changed'),
+    expected: true,
+  },
+  {
+    label: 'marks entry file component when entry file itself is changed',
+    fixture: 'page-with-changed-and-unchanged',
+    changedFiles: () => [fixture('page-with-changed-and-unchanged.tsx')],
+    get: (tree) => findNode(tree, 'Page')?.meta?.tags?.includes('git-changed'),
     expected: true,
   },
   {
     label: 'does not annotate when changedFiles is empty',
     fixture: 'page-with-changed-and-unchanged',
-    changedFiles: [],
+    changedFiles: () => [],
     get: (tree) => findNode(tree, 'ChangedWidget')?.meta?.tags?.includes('git-changed'),
     expected: undefined,
   },
