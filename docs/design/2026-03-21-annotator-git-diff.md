@@ -8,7 +8,7 @@
 
 This makes it immediately obvious which components in a render tree are affected by a given set of changes — useful for PR reviews, debugging, and impact analysis.
 
-The annotator itself is pure: it receives `changedFiles: string[]` as an argument and performs no I/O. Running `git diff` is the responsibility of the caller (typically the CLI).
+The annotator itself is pure: it receives `changedFiles: string[]` as an argument and performs no I/O. The CLI reads `changedFiles` from stdin, allowing the user to pipe any `git diff` invocation directly.
 
 ---
 
@@ -85,49 +85,36 @@ graph TD
 
 Packages affected:
 
-| Package              | Change                                                                                                                                  |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `annotator-git-diff` | **New** — traverses tree, compares resolved source paths against `changedFiles`, sets `meta.badge` and `meta.style`                     |
-| `cli`                | **Update** — register `git-diff` annotator; add `--git-ref` option; run `git diff --name-only` when `--annotator git-diff` is specified |
+| Package              | Change                                                                                                                  |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `annotator-git-diff` | **New** — traverses tree, compares resolved source paths against `changedFiles`, sets `meta.badge` and `meta.style`     |
+| `cli`                | **Update** — register `git-diff` annotator; read changed file paths from stdin when `--annotator git-diff` is specified |
 
 ---
 
 ## CLI Integration
 
-The annotator is opt-in via `--annotator git-diff`. When selected, the CLI runs `git diff --name-only` using the value of `--git-ref` (default: `HEAD`) and passes the result as `changedFiles` to the annotator factory.
+The annotator is opt-in via `--annotator git-diff`. When selected, the CLI reads newline-separated file paths from **stdin**. This lets users pipe any `git diff` invocation directly — no canopy-specific flags needed.
 
 ```sh
-# Changes since last commit (default)
-canopy src/app/page.tsx --annotator git-diff
+# Changes since last commit
+git diff --name-only HEAD | canopy src/app/page.tsx --annotator git-diff
 
 # Changes relative to a base branch (PR review)
-canopy src/app/page.tsx --annotator git-diff --git-ref main
+git diff --name-only main | canopy src/app/page.tsx --annotator git-diff
 
 # Staged changes only
-canopy src/app/page.tsx --annotator git-diff --git-ref --staged
+git diff --name-only --staged | canopy src/app/page.tsx --annotator git-diff
 
 # Combined with other annotators
-canopy src/app/page.tsx --annotator git-diff --annotator async --git-ref main
+git diff --name-only main | canopy src/app/page.tsx --annotator git-diff --annotator async
 ```
 
-### `cli.ts` change
+No new CLI options are added. The `--annotator` flag remains the only entry point.
 
-```ts
-cli
-  .command('<file>', 'Analyze a React component file and output a Mermaid flowchart')
-  .option('--component <name>', 'Name of the exported component to analyze')
-  .option('--annotator <name>', 'Annotator to apply (repeatable)', { type: [] })
-  .option(
-    '--git-ref <ref>',
-    'Git ref passed to git diff --name-only (used with --annotator git-diff)',
-    { default: 'HEAD' },
-  )
-  .action((file, options) => {
-    run(file, console.log, undefined, options.component, options.annotator ?? [], {
-      gitRef: options.gitRef,
-    });
-  });
-```
+### `cli.ts` — no change required
+
+The existing `--annotator` option is sufficient. No `--git-ref` option is added.
 
 ### `run.ts` change
 
@@ -138,28 +125,30 @@ export function run(
   project?: Project,
   componentName?: string,
   annotatorNames: string[] = [],
-  options: { gitRef?: string } = {},
+  stdinLines: string[] = [],
 ): void {
   const { tree, project: resolvedProject, sourceFilePath } = analyzeRenderTree({ ... });
 
   const annotators = annotatorNames.map((name) => {
     if (name === 'git-diff') {
-      const changedFiles = resolveChangedFiles(options.gitRef ?? 'HEAD');
-      return createGitDiffAnnotator(changedFiles)(sourceFilePath, resolvedProject);
+      return createGitDiffAnnotator(stdinLines)(sourceFilePath, resolvedProject);
     }
     return ANNOTATORS[name](sourceFilePath, resolvedProject);
   });
 
   createPipeline({ build: () => tree, annotators, reporter: createMermaidReporter(out) });
 }
+```
 
-function resolveChangedFiles(ref: string): string[] {
-  const flag = ref === '--staged' ? '--staged' : ref;
-  return execSync(`git diff --name-only ${flag}`)
-    .toString()
-    .split('\n')
-    .filter(Boolean);
-}
+`stdinLines` is read by the CLI entry point before calling `run`:
+
+```ts
+// cli.ts action handler
+const stdinLines = process.stdin.isTTY
+  ? []
+  : fs.readFileSync('/dev/stdin', 'utf8').split('\n').filter(Boolean);
+
+run(file, console.log, undefined, options.component, options.annotator ?? [], stdinLines);
 ```
 
 ---
@@ -336,5 +325,4 @@ packages/annotator-git-diff/
 
 ## Open Questions
 
-1. **`--git-ref` naming** — `--staged` as a value for `--git-ref` is a special case (it maps to `--staged` flag rather than a ref). An alternative is a separate `--git-staged` boolean flag. Deferred pending feedback.
-2. **Monorepo path normalization** — In a monorepo, `git diff --name-only` returns paths relative to the repo root, while the component file paths resolved by ts-morph are absolute. The annotator resolves this via `path.resolve(cwd)`, but `cwd` should be the git repo root, not the package root. This needs to be validated against real monorepo setups.
+1. **Monorepo path normalization** — In a monorepo, `git diff --name-only` returns paths relative to the repo root, while the component file paths resolved by ts-morph are absolute. The annotator resolves this via `path.resolve(cwd)`, but `cwd` should be the git repo root, not the package root. This needs to be validated against real monorepo setups.
