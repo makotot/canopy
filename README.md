@@ -119,6 +119,15 @@ Annotators are opt-in via `--annotator`. Multiple flags can be combined.
 | `--annotator client-boundary` | ⚡   | Marks RSC client boundary components and groups their subtree |
 | `--annotator suspense`        | ⏳   | Marks `<Suspense>` boundaries with a yellow highlight         |
 | `--annotator context`         | ◎    | Marks context providers and consumers with cross-links        |
+| `--annotator external`        | 📦   | Marks components from user-specified npm packages             |
+
+The `external` annotator requires `--external-packages` to specify which packages to highlight:
+
+```sh
+canopy app/page.tsx --annotator external --external-packages "@radix-ui,lucide-react"
+```
+
+`--external-packages` accepts a comma-separated list of package names or scoped package prefixes. A prefix like `@radix-ui` matches any package under that scope (e.g. `@radix-ui/react-dialog`, `@radix-ui/react-tooltip`).
 
 ### Interactive mode
 
@@ -131,9 +140,10 @@ npx @makotot/canopy-cli --interactive
 ### Options
 
 ```
--i, --interactive    Launch interactive mode
---component <name>   Analyze a named export instead of the default export
---annotator <name>   Annotator to apply (repeatable)
+-i, --interactive           Launch interactive mode
+--component <name>          Analyze a named export instead of the default export
+--annotator <name>          Annotator to apply (repeatable)
+--external-packages <pkgs>  Comma-separated package names for the external annotator
 ```
 
 ## Contributing
@@ -155,15 +165,16 @@ node packages/cli/dist/cli.js <file>
 
 ## Packages
 
-| Package                                                                             | Description                                 |
-| ----------------------------------------------------------------------------------- | ------------------------------------------- |
-| [`@makotot/canopy-cli`](./packages/cli)                                             | CLI entrypoint (`canopy` command)           |
-| [`@makotot/canopy-core`](./packages/core)                                           | Analyzer, pipeline, and shared types        |
-| [`@makotot/canopy-annotator-async`](./packages/annotator-async)                     | Marks `async` server components             |
-| [`@makotot/canopy-annotator-client-boundary`](./packages/annotator-client-boundary) | Marks RSC client boundary components        |
-| [`@makotot/canopy-annotator-suspense`](./packages/annotator-suspense)               | Marks React Suspense boundaries             |
-| [`@makotot/canopy-annotator-context`](./packages/annotator-context)                 | Marks React Context providers and consumers |
-| [`@makotot/canopy-reporter-mermaid`](./packages/reporter-mermaid)                   | Renders Mermaid flowchart output            |
+| Package                                                                             | Description                                       |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------- |
+| [`@makotot/canopy-cli`](./packages/cli)                                             | CLI entrypoint (`canopy` command)                 |
+| [`@makotot/canopy-core`](./packages/core)                                           | Analyzer, pipeline, and shared types              |
+| [`@makotot/canopy-annotator-async`](./packages/annotator-async)                     | Marks `async` server components                   |
+| [`@makotot/canopy-annotator-client-boundary`](./packages/annotator-client-boundary) | Marks RSC client boundary components              |
+| [`@makotot/canopy-annotator-suspense`](./packages/annotator-suspense)               | Marks React Suspense boundaries                   |
+| [`@makotot/canopy-annotator-context`](./packages/annotator-context)                 | Marks React Context providers and consumers       |
+| [`@makotot/canopy-annotator-external`](./packages/annotator-external)               | Marks components from user-specified npm packages |
+| [`@makotot/canopy-reporter-mermaid`](./packages/reporter-mermaid)                   | Renders Mermaid flowchart output                  |
 
 ## Requirements
 

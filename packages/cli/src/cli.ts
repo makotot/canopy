@@ -2,6 +2,7 @@
 import { cac } from 'cac';
 import { run } from './run.js';
 import { runInteractive } from './interactive.js';
+import { buildAnnotators } from './annotators.js';
 
 const cli = cac('canopy');
 
@@ -12,10 +13,16 @@ cli
   .option('--annotator <name>', 'Annotator to apply: async, client-boundary (repeatable)', {
     type: [],
   })
+  .option('--external-packages <pkgs>', 'Comma-separated package names for the external annotator')
   .action(
     async (
       file: string | undefined,
-      options: { interactive?: boolean; component?: string; annotator?: string[] },
+      options: {
+        interactive?: boolean;
+        component?: string;
+        annotator?: string[];
+        externalPackages?: string;
+      },
     ) => {
       if (options.interactive) {
         await runInteractive(console.log);
@@ -25,7 +32,10 @@ cli
         cli.outputHelp();
         return;
       }
-      run(file, console.log, undefined, options.component, options.annotator ?? []);
+      const factories = buildAnnotators(options.annotator ?? [], {
+        externalPackages: options.externalPackages,
+      });
+      run(file, console.log, undefined, options.component, factories);
     },
   );
 
