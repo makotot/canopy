@@ -140,13 +140,18 @@ export function run(
 }
 ```
 
-`stdinLines` is read by the CLI entry point before calling `run`:
+`stdinLines` is read and normalized by the CLI entry point before calling `run`. Because `git diff --name-only` always outputs paths relative to the **git repository root** (not `cwd`), the CLI resolves the repo root via `git rev-parse --show-toplevel` and converts each path to absolute before passing it to the annotator. This ensures correct matching regardless of which directory the user invokes `canopy` from, including monorepos where `cwd` is a package subdirectory.
 
 ```ts
 // cli.ts action handler
+const repoRoot = execSync('git rev-parse --show-toplevel').toString().trim();
 const stdinLines = process.stdin.isTTY
   ? []
-  : fs.readFileSync('/dev/stdin', 'utf8').split('\n').filter(Boolean);
+  : fs
+      .readFileSync('/dev/stdin', 'utf8')
+      .split('\n')
+      .filter(Boolean)
+      .map((f) => path.resolve(repoRoot, f));
 
 run(file, console.log, undefined, options.component, options.annotator ?? [], stdinLines);
 ```
@@ -161,7 +166,7 @@ export function createGitDiffAnnotator(
 ): (sourceFilePath: string, project: Project) => Annotator<TreeNode>;
 ```
 
-- `changedFiles` — list of file paths that appear in the diff. May be relative or absolute; the annotator normalizes them against the working directory before comparison.
+- `changedFiles` — list of **absolute** file paths that appear in the diff. Path normalization (repo-root resolution) is the caller's responsibility; the annotator stores these as-is in a `Set` for O(1) lookup.
 - The returned function matches the standard annotator factory signature `(sourceFilePath, project) => Annotator<TreeNode>`, consistent with other annotators.
 - `sourceFilePath` — absolute path to the entry file. Used as the base for `resolveComponent`.
 - `project` — the shared ts-morph `Project` instance. Used to resolve each component's source file path.
@@ -191,9 +196,8 @@ Fields are absent when the component's source file is not in `changedFiles` (spa
 
 ### Setup (inside factory closure)
 
-1. Receive `changedFiles: string[]`.
-2. Resolve each path to an absolute path using `path.resolve(cwd, f)` to normalize relative paths.
-3. Store as `changedSet: Set<string>`.
+1. Receive `changedFiles: string[]` (already absolute paths, normalized by the CLI).
+2. Store as `changedSet: Set<string>` for O(1) lookup.
 
 ### Tree Walk
 
@@ -278,13 +282,6 @@ it.each([
     expected: true,
   },
   {
-    label: 'accepts absolute paths in changedFiles',
-    fixture: 'page-with-changed-and-unchanged',
-    changedFiles: [path.resolve('src/__fixtures__/changed-widget.tsx')],
-    get: (tree) => findNode(tree, 'ChangedWidget')?.meta?.tags?.includes('git-changed'),
-    expected: true,
-  },
-  {
     label: 'does not annotate when changedFiles is empty',
     fixture: 'page-with-changed-and-unchanged',
     changedFiles: [],
@@ -318,11 +315,7 @@ packages/annotator-git-diff/
 ```
 1. export function createGitDiffAnnotator(...)   ← public API
 2. function annotateNode(...)                     ← recursive tree walk
-3. function buildChangedSet(...)                  ← normalizes changedFiles to absolute paths
+3. function buildChangedSet(...)                  ← stores changedFiles as a Set for O(1) lookup
 ```
 
 ---
-
-## Open Questions
-
-1. **Monorepo path normalization** — In a monorepo, `git diff --name-only` returns paths relative to the repo root, while the component file paths resolved by ts-morph are absolute. The annotator resolves this via `path.resolve(cwd)`, but `cwd` should be the git repo root, not the package root. This needs to be validated against real monorepo setups.
