@@ -132,19 +132,20 @@ const annotatorNames = options.annotator ?? [];
 const annotatorOverrides: Record<string, AnnotatorFactory> = {};
 
 if (annotatorNames.includes('git-diff')) {
+  let changedFiles: string[] = [];
   if (process.stdin.isTTY) {
     process.stderr.write(
       'warning: --annotator git-diff requires piped input, e.g.: git diff --name-only HEAD | canopy ...\n',
     );
   } else {
     const repoRoot = execSync('git rev-parse --show-toplevel').toString().trim();
-    const changedFiles = fs
+    changedFiles = fs
       .readFileSync('/dev/stdin', 'utf8')
       .split('\n')
       .filter(Boolean)
       .map((f) => path.resolve(repoRoot, f));
-    annotatorOverrides['git-diff'] = createGitDiffAnnotator(changedFiles);
   }
+  annotatorOverrides['git-diff'] = createGitDiffAnnotator(changedFiles);
 }
 
 run(file, console.log, undefined, options.component, annotatorNames, annotatorOverrides);
