@@ -85,10 +85,10 @@ graph TD
 
 Packages affected:
 
-| Package              | Change                                                                                                                  |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `annotator-git-diff` | **New** — traverses tree, compares resolved source paths against `changedFiles`, sets `meta.badge` and `meta.style`     |
-| `cli`                | **Update** — register `git-diff` annotator; read changed file paths from stdin when `--annotator git-diff` is specified |
+| Package              | Change                                                                                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `annotator-git-diff` | **New** — traverses tree, compares resolved source paths against `changedFiles`, sets `meta.badge` and `meta.style`                                    |
+| `cli`                | **Update** — handle `git-diff` outside the `ANNOTATORS` registry via `annotatorOverrides`; read changed file paths from stdin and pre-apply to factory |
 
 ---
 
@@ -114,18 +114,22 @@ No new CLI options are added. The `--annotator` flag remains the only entry poin
 
 ### `cli.ts` change (action handler only, no new options)
 
-The existing `--annotator` option is sufficient. No new flags are added. Only the action handler changes to read stdin and pass `changedFiles` to `run`.
+The existing `--annotator` option is sufficient. No new flags are added. Only the action handler changes to read stdin and build `annotatorOverrides`.
 
-`git-diff` requires external state (`changedFiles`) that other annotators do not. Therefore it is **not** registered in `ANNOTATORS` and is handled explicitly in `run.ts`. This is the necessary exception to the registry pattern.
+`git-diff` requires external state (`changedFiles`) that other annotators do not. The CLI resolves this by constructing a pre-applied factory (`createGitDiffAnnotator(changedFiles)`) and passing it via `annotatorOverrides`. This keeps `run.ts` free of annotator-specific knowledge and provides a general extension point for any future annotator requiring external data.
 
 Because `git diff --name-only` outputs paths relative to the **git repository root** (not `cwd`), the CLI resolves the repo root via `git rev-parse --show-toplevel` and converts each path to absolute. This ensures correct matching regardless of which directory `canopy` is invoked from, including monorepos. The `git rev-parse` call runs **only** when `--annotator git-diff` is present.
 
 If `--annotator git-diff` is specified but stdin is a TTY (no pipe), the CLI emits a warning to stderr and proceeds with `changedFiles: []` — no components will be annotated.
 
+Note: `fs.readFileSync('/dev/stdin', ...)` is Linux/macOS only. Windows is out of scope for v0.1.
+
 ```ts
 // cli.ts action handler
+type AnnotatorFactory = (sourceFilePath: string, project: Project) => Annotator<TreeNode>;
+
 const annotatorNames = options.annotator ?? [];
-let changedFiles: string[] = [];
+const annotatorOverrides: Record<string, AnnotatorFactory> = {};
 
 if (annotatorNames.includes('git-diff')) {
   if (process.stdin.isTTY) {
@@ -134,42 +138,43 @@ if (annotatorNames.includes('git-diff')) {
     );
   } else {
     const repoRoot = execSync('git rev-parse --show-toplevel').toString().trim();
-    changedFiles = fs
+    const changedFiles = fs
       .readFileSync('/dev/stdin', 'utf8')
       .split('\n')
       .filter(Boolean)
       .map((f) => path.resolve(repoRoot, f));
+    annotatorOverrides['git-diff'] = createGitDiffAnnotator(changedFiles);
   }
 }
 
-run(file, console.log, undefined, options.component, annotatorNames, changedFiles);
+run(file, console.log, undefined, options.component, annotatorNames, annotatorOverrides);
 ```
 
 ### `run.ts` change
 
-`git-diff` is handled outside the `ANNOTATORS` registry because its factory requires `changedFiles`, which is external data unavailable at registry definition time. The `changedFiles` parameter conveys this data; it is only used when `'git-diff'` appears in `annotatorNames`.
+`run` accepts an `annotatorOverrides` map of pre-configured factories. `ANNOTATORS` (the static registry) is the default; `annotatorOverrides` takes precedence. This allows annotators requiring external data to be injected by the caller without `run.ts` knowing anything about them.
 
 ```ts
+type AnnotatorFactory = (sourceFilePath: string, project: Project) => Annotator<TreeNode>;
+
 export function run(
   filePath: string,
   out: Out,
   project?: Project,
   componentName?: string,
   annotatorNames: string[] = [],
-  changedFiles: string[] = [],
+  annotatorOverrides: Record<string, AnnotatorFactory> = {},
 ): void {
   for (const name of annotatorNames) {
-    if (name !== 'git-diff' && !(name in ANNOTATORS)) {
+    if (!(name in ANNOTATORS) && !(name in annotatorOverrides)) {
       throw new Error(`Unknown annotator: ${name}`);
     }
   }
   const { tree, project: resolvedProject, sourceFilePath } = analyzeRenderTree({ ... });
 
   const annotators = annotatorNames.map((name) => {
-    if (name === 'git-diff') {
-      return createGitDiffAnnotator(changedFiles)(sourceFilePath, resolvedProject);
-    }
-    return ANNOTATORS[name]!(sourceFilePath, resolvedProject);
+    const factory = annotatorOverrides[name] ?? ANNOTATORS[name]!;
+    return factory(sourceFilePath, resolvedProject);
   });
 
   createPipeline({ build: () => tree, annotators, reporter: createMermaidReporter(out) });
@@ -195,20 +200,19 @@ export function createGitDiffAnnotator(
 
 ## Meta Schema
 
+This annotator appends the following fields when a component's source file is in `changedFiles`:
+
 ```ts
 meta: {
-  badge: '⎇';
-  style: {
-    fill: '#fef3c7';
-    stroke: '#f59e0b';
-  }
-  tags: ['git-changed'];
+  badge: string;       // '⎇' appended via appendBadge
+  style: { fill: string; stroke: string };  // { fill: '#fef3c7', stroke: '#f59e0b' }
+  tags: string[];      // 'git-changed' appended via appendTag
 }
 ```
 
 Fields are absent when the component's source file is not in `changedFiles` (sparse meta convention, consistent with other annotators).
 
-`meta.tags` is the shared annotator-specific field for programmatic consumers (written via `appendTag` from `@makotot/canopy-core`). `meta.badge` and `meta.style` are the render convention fields read by `reporter-mermaid`.
+`meta.tags` accumulates tags from all annotators — running `--annotator async --annotator git-diff` yields `tags: ['async', 'git-changed']`. Similarly, `meta.badge` and `meta.style` follow last-writer-wins when multiple annotators run on the same node. Annotator ordering is determined by the order of `--annotator` flags.
 
 ---
 
@@ -347,7 +351,6 @@ packages/annotator-git-diff/
 ```
 1. export function createGitDiffAnnotator(...)   ← public API
 2. function annotateNode(...)                     ← recursive tree walk
-3. function buildChangedSet(...)                  ← stores changedFiles as a Set for O(1) lookup
 ```
 
 ---
