@@ -177,13 +177,13 @@ meta: {
     fill: '#fef3c7';
     stroke: '#f59e0b';
   }
-  gitChanged: true;
+  tags: ['git-changed'];
 }
 ```
 
 Fields are absent when the component's source file is not in `changedFiles` (sparse meta convention, consistent with other annotators).
 
-`meta.gitChanged` is an annotator-specific field for programmatic consumers. `meta.badge` and `meta.style` are the render convention fields read by `reporter-mermaid`.
+`meta.tags` is the shared annotator-specific field for programmatic consumers (written via `appendTag` from `@makotot/canopy-core`). `meta.badge` and `meta.style` are the render convention fields read by `reporter-mermaid`.
 
 ---
 
@@ -207,9 +207,9 @@ For each `TreeNode`:
    ```ts
    meta: {
      ...node.meta,
-     badge: '⎇',
+     ...appendBadge(node.meta, '⎇'),
+     ...appendTag(node.meta, 'git-changed'),
      style: { fill: '#fef3c7', stroke: '#f59e0b' },
-     gitChanged: true,
    }
    ```
 6. Recurse into `node.children` and each value in `node.props`.
@@ -239,7 +239,7 @@ it.each([
     label: 'marks component whose source file is in changedFiles',
     fixture: 'page-with-changed-and-unchanged',
     changedFiles: ['src/__fixtures__/changed-widget.tsx'],
-    get: (tree) => findNode(tree, 'ChangedWidget')?.meta?.gitChanged,
+    get: (tree) => findNode(tree, 'ChangedWidget')?.meta?.tags?.includes('git-changed'),
     expected: true,
   },
   {
@@ -260,35 +260,35 @@ it.each([
     label: 'does not mark component not in changedFiles',
     fixture: 'page-with-changed-and-unchanged',
     changedFiles: ['src/__fixtures__/changed-widget.tsx'],
-    get: (tree) => findNode(tree, 'UnchangedWidget')?.meta?.gitChanged,
+    get: (tree) => findNode(tree, 'UnchangedWidget')?.meta?.tags?.includes('git-changed'),
     expected: undefined,
   },
   {
     label: 'does not mark HTML intrinsic elements',
     fixture: 'page-with-changed-and-unchanged',
     changedFiles: ['src/__fixtures__/changed-widget.tsx'],
-    get: (tree) => findNode(tree, 'main')?.meta?.gitChanged,
+    get: (tree) => findNode(tree, 'main')?.meta?.tags?.includes('git-changed'),
     expected: undefined,
   },
   {
     label: 'marks nested changed component',
     fixture: 'page-with-nested-changed',
     changedFiles: ['src/__fixtures__/changed-widget.tsx'],
-    get: (tree) => findNode(tree, 'ChangedWidget')?.meta?.gitChanged,
+    get: (tree) => findNode(tree, 'ChangedWidget')?.meta?.tags?.includes('git-changed'),
     expected: true,
   },
   {
     label: 'accepts absolute paths in changedFiles',
     fixture: 'page-with-changed-and-unchanged',
     changedFiles: [path.resolve('src/__fixtures__/changed-widget.tsx')],
-    get: (tree) => findNode(tree, 'ChangedWidget')?.meta?.gitChanged,
+    get: (tree) => findNode(tree, 'ChangedWidget')?.meta?.tags?.includes('git-changed'),
     expected: true,
   },
   {
     label: 'does not annotate when changedFiles is empty',
     fixture: 'page-with-changed-and-unchanged',
     changedFiles: [],
-    get: (tree) => findNode(tree, 'ChangedWidget')?.meta?.gitChanged,
+    get: (tree) => findNode(tree, 'ChangedWidget')?.meta?.tags?.includes('git-changed'),
     expected: undefined,
   },
 ])('$label', ...)
