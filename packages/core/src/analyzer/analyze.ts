@@ -89,18 +89,19 @@ function resolveFuncNode(sourceFile: SourceFile, componentName?: string) {
   if (defaultFunc) {
     return defaultFunc;
   }
-  const namedFuncs = [...sourceFile.getExportedDeclarations().keys()]
+  const namedEntries = [...sourceFile.getExportedDeclarations().keys()]
     .filter((name) => name !== 'default')
     .flatMap((name) => {
       const fn = getNamedExportedFunction(sourceFile, name);
-      return fn ? [fn] : [];
+      return fn ? [{ name, fn }] : [];
     });
-  if (namedFuncs.length > 1) {
+  if (namedEntries.length > 1) {
+    const names = namedEntries.map((e) => e.name).join(', ');
     throw new Error(
-      'Multiple exported function components found. Specify one with --component <name>.',
+      `Multiple exported function components found: ${names}. Specify one with --component <name>.`,
     );
   }
-  return namedFuncs[0];
+  return namedEntries[0]?.fn;
 }
 
 function extractJsxFromFunc(funcNode: Node, sourceFile: SourceFile) {
