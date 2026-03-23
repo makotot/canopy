@@ -1,5 +1,12 @@
 # @makotot/canopy-annotator-suspense
 
+## 0.3.1
+
+### Patch Changes
+
+- Updated dependencies [f4f6613]
+  - @makotot/canopy-core@0.4.1
+
 ## 0.3.0
 
 ### Minor Changes

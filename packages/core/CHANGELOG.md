@@ -1,5 +1,11 @@
 # @makotot/canopy-core
 
+## 0.4.1
+
+### Patch Changes
+
+- f4f6613: analyzeRenderTree now includes the names of all exported function components in the error message when multiple are
+
 ## 0.4.0
 
 ### Minor Changes

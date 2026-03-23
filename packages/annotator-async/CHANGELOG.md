@@ -1,5 +1,12 @@
 # @makotot/canopy-annotator-async
 
+## 0.5.1
+
+### Patch Changes
+
+- Updated dependencies [f4f6613]
+  - @makotot/canopy-core@0.4.1
+
 ## 0.5.0
 
 ### Minor Changes
