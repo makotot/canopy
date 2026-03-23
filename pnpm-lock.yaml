@@ -63,6 +63,16 @@ importers:
         specifier: 27.0.2
         version: 27.0.2
 
+  packages/annotator-semantic:
+    dependencies:
+      '@makotot/canopy-core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      ts-morph:
+        specifier: 27.0.2
+        version: 27.0.2
+
   packages/annotator-suspense:
     dependencies:
       '@makotot/canopy-core':
@@ -86,6 +96,9 @@ importers:
       '@makotot/canopy-annotator-context':
         specifier: workspace:*
         version: link:../annotator-context
+      '@makotot/canopy-annotator-semantic':
+        specifier: workspace:*
+        version: link:../annotator-semantic
       '@makotot/canopy-annotator-suspense':
         specifier: workspace:*
         version: link:../annotator-suspense

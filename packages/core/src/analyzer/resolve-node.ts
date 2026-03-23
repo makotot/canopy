@@ -9,12 +9,13 @@ export function resolveNode(
   callerFilePath: string,
   project: Project,
   visited: Set<string>,
+  attrsToCollect?: string[],
 ): TreeNode {
   const resolvedProps = node.props
     ? Object.fromEntries(
         Object.entries(node.props).map(([k, v]) => [
           k,
-          v.map((c) => resolveNode(c, callerFilePath, project, visited)),
+          v.map((c) => resolveNode(c, callerFilePath, project, visited, attrsToCollect)),
         ]),
       )
     : undefined;
@@ -22,13 +23,17 @@ export function resolveNode(
   const withProps = (n: TreeNode) => ({ ...n, ...(resolvedProps ? { props: resolvedProps } : {}) });
 
   if (!/^[A-Z]/.test(node.component)) {
-    const children = node.children.map((c) => resolveNode(c, callerFilePath, project, visited));
+    const children = node.children.map((c) =>
+      resolveNode(c, callerFilePath, project, visited, attrsToCollect),
+    );
     return withProps({ ...node, children });
   }
 
   const funcNode = resolveComponent(node.component, callerFilePath, project);
   if (!funcNode) {
-    const children = node.children.map((c) => resolveNode(c, callerFilePath, project, visited));
+    const children = node.children.map((c) =>
+      resolveNode(c, callerFilePath, project, visited, attrsToCollect),
+    );
     return withProps({ ...node, children });
   }
 
@@ -40,20 +45,28 @@ export function resolveNode(
   }
 
   if (node.children.length > 0) {
-    const children = node.children.map((c) => resolveNode(c, callerFilePath, project, visited));
+    const children = node.children.map((c) =>
+      resolveNode(c, callerFilePath, project, visited, attrsToCollect),
+    );
     return withProps({ ...node, children });
   }
 
   visited.add(visitKey);
-  const internalChildren = extractJsxFromFunc(funcNode, funcNode.getSourceFile()).map((c) =>
-    resolveNode(c, funcFilePath, project, visited),
-  );
+  const internalChildren = extractJsxFromFunc(
+    funcNode,
+    funcNode.getSourceFile(),
+    attrsToCollect,
+  ).map((c) => resolveNode(c, funcFilePath, project, visited, attrsToCollect));
   visited.delete(visitKey);
 
   return withProps({ ...node, children: internalChildren });
 }
 
-function extractJsxFromFunc(funcNode: Node, sourceFile: SourceFile): TreeNode[] {
+function extractJsxFromFunc(
+  funcNode: Node,
+  sourceFile: SourceFile,
+  attrsToCollect?: string[],
+): TreeNode[] {
   for (const ret of funcNode.getDescendantsOfKind(SyntaxKind.ReturnStatement)) {
     const expr = ret.getExpression();
     if (!expr) {
@@ -61,13 +74,13 @@ function extractJsxFromFunc(funcNode: Node, sourceFile: SourceFile): TreeNode[] 
     }
     const target = Node.isParenthesizedExpression(expr) ? expr.getExpression() : expr;
     if (Node.isJsxElement(target)) {
-      return [parseJsxElement(target, sourceFile)];
+      return [parseJsxElement(target, sourceFile, attrsToCollect)];
     }
     if (Node.isJsxSelfClosingElement(target)) {
-      return [parseSelfClosingElement(target, sourceFile)];
+      return [parseSelfClosingElement(target, sourceFile, attrsToCollect)];
     }
     if (Node.isJsxFragment(target)) {
-      return parseJsxChildren(target.getJsxChildren(), sourceFile);
+      return parseJsxChildren(target.getJsxChildren(), sourceFile, attrsToCollect);
     }
   }
   return [];
