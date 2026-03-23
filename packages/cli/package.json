@@ -1,6 +1,6 @@
 {
   "name": "@makotot/canopy-cli",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "description": "CLI for Canopy — visualize React render trees as Mermaid flowcharts",
   "license": "MIT",
   "repository": {
