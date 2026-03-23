@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { type Project } from 'ts-morph';
 import { createProject } from '@makotot/canopy-core';
+import { createAsyncAnnotator } from '@makotot/canopy-annotator-async';
 import { run } from './run.js';
+import { buildAnnotators } from './annotators.js';
 
 const fixture = (name: string) =>
   new URL(`../../core/src/__fixtures__/${name}`, import.meta.url).pathname;
@@ -99,14 +101,14 @@ describe('run', () => {
       },
       project,
       undefined,
-      ['async'],
+      [createAsyncAnnotator],
     );
     expect(output).toContain('<br/>↻');
   });
 
   it('throws for unknown annotator name', () => {
-    expect(() =>
-      run(fixture('simple-page.tsx'), () => {}, project, undefined, ['unknown-annotator']),
-    ).toThrow('Unknown annotator: unknown-annotator');
+    expect(() => buildAnnotators(['unknown-annotator'])).toThrow(
+      'Unknown annotator: unknown-annotator',
+    );
   });
 });

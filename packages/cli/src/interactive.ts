@@ -1,6 +1,6 @@
 import { intro, text, multiselect, outro, isCancel, cancel } from '@clack/prompts';
 import { type Out } from '@makotot/canopy-core';
-import { ANNOTATORS } from './annotators.js';
+import { ANNOTATOR_BUILDERS, buildAnnotators } from './annotators.js';
 import { run } from './run.js';
 
 export async function runInteractive(out: Out): Promise<void> {
@@ -26,12 +26,28 @@ export async function runInteractive(out: Out): Promise<void> {
 
   const selectedAnnotators = await multiselect({
     message: 'Select annotators',
-    options: Object.keys(ANNOTATORS).map((name) => ({ value: name, label: name })),
+    options: Object.keys(ANNOTATOR_BUILDERS).map((name) => ({ value: name, label: name })),
     required: false,
   });
   if (isCancel(selectedAnnotators)) {
     cancel('Cancelled');
     process.exit(0);
+  }
+
+  let externalPackages: string | undefined;
+  if ((selectedAnnotators as string[]).includes('external')) {
+    const input = await text({
+      message: 'Package names for external annotator (comma-separated)',
+      validate: (value) =>
+        value === undefined || value.trim() === ''
+          ? 'At least one package name is required'
+          : undefined,
+    });
+    if (isCancel(input)) {
+      cancel('Cancelled');
+      process.exit(0);
+    }
+    externalPackages = input;
   }
 
   outro('Running…');
@@ -41,6 +57,6 @@ export async function runInteractive(out: Out): Promise<void> {
     out,
     undefined,
     componentName.trim() !== '' ? componentName : undefined,
-    selectedAnnotators as string[],
+    buildAnnotators(selectedAnnotators as string[], { externalPackages }),
   );
 }
