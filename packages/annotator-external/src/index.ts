@@ -54,7 +54,7 @@ function buildExternalMeta(
   meta: Record<string, unknown> | undefined,
   matchedPkg: string,
 ): Record<string, unknown> {
-  const withBadge = { ...meta, ...appendBadge(meta, '📦') };
+  const withBadge = { ...meta, ...appendBadge(meta, `📦 ${matchedPkg}`) };
   const withExternal = { ...withBadge, ...appendTag(withBadge, 'external') };
   const withPkg = { ...withExternal, ...appendTag(withExternal, matchedPkg) };
   return { ...withPkg, style: { fill: '#f0f9ff', stroke: '#7dd3fc' } };

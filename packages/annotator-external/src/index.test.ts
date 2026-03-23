@@ -49,7 +49,7 @@ describe('createExternalAnnotator', () => {
     expect(get(annotator(tree))).toEqual(expected);
   });
 
-  it('sets meta.badge to ["📦"] on matched component', () => {
+  it('sets meta.badge to ["📦 lucide-react"] on matched component', () => {
     const { tree, sourceFilePath } = analyzeRenderTree({
       filePath: fixture('app-with-external.tsx'),
       project,
@@ -58,7 +58,7 @@ describe('createExternalAnnotator', () => {
       packages: ['lucide-react'],
     });
     const meta = annotator(tree).children[0]?.children.find((c) => c.component === 'Search')?.meta;
-    expect(meta?.['badge']).toEqual(['📦']);
+    expect(meta?.['badge']).toEqual(['📦 lucide-react']);
   });
 
   it('sets meta.style on matched component', () => {
