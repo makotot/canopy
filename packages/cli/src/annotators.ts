@@ -14,7 +14,7 @@ export interface BuildAnnotatorsOptions {
 
 type AnnotatorBuilder = (options: BuildAnnotatorsOptions) => AnnotatorFactory;
 
-const ANNOTATOR_BUILDERS: Record<string, AnnotatorBuilder> = {
+export const ANNOTATOR_BUILDERS: Record<string, AnnotatorBuilder> = {
   async: () => createAsyncAnnotator,
   'client-boundary': () => createClientBoundaryAnnotator,
   suspense: () => createSuspenseAnnotator,
@@ -24,8 +24,6 @@ const ANNOTATOR_BUILDERS: Record<string, AnnotatorBuilder> = {
     return (sf, p) => createExternalAnnotator(sf, p, { packages });
   },
 };
-
-export const ANNOTATORS = ANNOTATOR_BUILDERS;
 
 export function buildAnnotators(
   names: string[],

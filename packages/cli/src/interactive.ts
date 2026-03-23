@@ -1,6 +1,6 @@
 import { intro, text, multiselect, outro, isCancel, cancel } from '@clack/prompts';
 import { type Out } from '@makotot/canopy-core';
-import { ANNOTATORS, buildAnnotators } from './annotators.js';
+import { ANNOTATOR_BUILDERS, buildAnnotators } from './annotators.js';
 import { run } from './run.js';
 
 export async function runInteractive(out: Out): Promise<void> {
@@ -26,7 +26,7 @@ export async function runInteractive(out: Out): Promise<void> {
 
   const selectedAnnotators = await multiselect({
     message: 'Select annotators',
-    options: Object.keys(ANNOTATORS).map((name) => ({ value: name, label: name })),
+    options: Object.keys(ANNOTATOR_BUILDERS).map((name) => ({ value: name, label: name })),
     required: false,
   });
   if (isCancel(selectedAnnotators)) {
