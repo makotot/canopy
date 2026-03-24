@@ -9,7 +9,8 @@
       "@makotot/canopy-annotator-suspense": ["../annotator-suspense/src/index.ts"],
       "@makotot/canopy-annotator-context": ["../annotator-context/src/index.ts"],
       "@makotot/canopy-annotator-external": ["../annotator-external/src/index.ts"],
-      "@makotot/canopy-reporter-mermaid": ["../reporter-mermaid/src/index.ts"]
+      "@makotot/canopy-reporter-mermaid": ["../reporter-mermaid/src/index.ts"],
+      "@makotot/canopy-reporter-json": ["../reporter-json/src/index.ts"]
     }
   },
   "include": ["src"]
