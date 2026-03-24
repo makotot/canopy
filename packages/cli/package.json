@@ -30,6 +30,7 @@
     "@makotot/canopy-annotator-context": "workspace:*",
     "@makotot/canopy-annotator-external": "workspace:*",
     "@makotot/canopy-core": "workspace:*",
+    "@makotot/canopy-reporter-json": "workspace:*",
     "@makotot/canopy-reporter-mermaid": "workspace:*",
     "cac": "7.0.0"
   },

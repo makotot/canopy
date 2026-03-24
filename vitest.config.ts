@@ -25,6 +25,9 @@ export default defineConfig({
       '@makotot/canopy-reporter-mermaid': fileURLToPath(
         new URL('./packages/reporter-mermaid/src/index.ts', import.meta.url),
       ),
+      '@makotot/canopy-reporter-json': fileURLToPath(
+        new URL('./packages/reporter-json/src/index.ts', import.meta.url),
+      ),
     },
   },
   test: {

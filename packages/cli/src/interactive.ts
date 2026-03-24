@@ -1,7 +1,7 @@
-import { intro, text, multiselect, outro, isCancel, cancel } from '@clack/prompts';
+import { intro, text, multiselect, select, outro, isCancel, cancel } from '@clack/prompts';
 import { type Out } from '@makotot/canopy-core';
 import { ANNOTATOR_BUILDERS, buildAnnotators } from './annotators.js';
-import { run } from './run.js';
+import { run, reporterFactories } from './run.js';
 
 export async function runInteractive(out: Out): Promise<void> {
   intro('canopy');
@@ -50,6 +50,15 @@ export async function runInteractive(out: Out): Promise<void> {
     externalPackages = input;
   }
 
+  const selectedReporter = await select({
+    message: 'Select reporter',
+    options: Object.keys(reporterFactories).map((name) => ({ value: name, label: name })),
+  });
+  if (isCancel(selectedReporter)) {
+    cancel('Cancelled');
+    process.exit(0);
+  }
+
   outro('Running…');
 
   run(
@@ -58,5 +67,6 @@ export async function runInteractive(out: Out): Promise<void> {
     undefined,
     componentName.trim() !== '' ? componentName : undefined,
     buildAnnotators(selectedAnnotators as string[], { externalPackages }),
+    reporterFactories[selectedReporter as string],
   );
 }

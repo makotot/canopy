@@ -1,0 +1,31 @@
+{
+  "name": "@makotot/canopy-reporter-json",
+  "version": "0.0.0",
+  "description": "Canopy reporter — renders render trees as JSON",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/makotot/canopy.git",
+    "directory": "packages/reporter-json"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@makotot/canopy-core": "workspace:*"
+  }
+}
