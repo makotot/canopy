@@ -119,18 +119,6 @@ describe('createSuspenseAnnotator', () => {
     expect(meta?.['tags']).toEqual(['suspense']);
   });
 
-  it('sets meta.style with yellow fill and stroke on Suspense boundary', () => {
-    const { tree, sourceFilePath } = analyzeRenderTree({
-      filePath: fixture('page-with-suspense.tsx'),
-      project,
-    });
-    const annotator = createSuspenseAnnotator(sourceFilePath, project);
-    expect(annotator(tree).children[0]?.children[0]?.meta?.['style']).toStrictEqual({
-      fill: '#fef9c3',
-      stroke: '#fde047',
-    });
-  });
-
   it('also annotates Suspense inside props.fallback subtree', () => {
     // If a Suspense appears inside a fallback prop, it should be annotated too.
     // page-with-suspense-fallback.tsx has Spinner in fallback prop — no nested Suspense,

@@ -19,7 +19,6 @@ function annotateNode(node: TreeNode, sourceFilePath: string, project: Project):
             ...node.meta,
             ...appendTag(node.meta, 'suspense'),
             ...appendBadge(node.meta, '⏳'),
-            style: { fill: '#fef9c3', stroke: '#fde047' },
           },
         }
       : {}),

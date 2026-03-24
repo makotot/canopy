@@ -5,6 +5,7 @@ export function renderMermaid(tree: TreeNode): string {
   const edgeDefs: string[] = [];
   const styleDefs: string[] = [];
   const counter = { n: 0 };
+  const tagKindMap = new Map<string, number>();
   const linkIdMap = new Map<string, string>();
   const pendingCrossLinks: Array<{ sourceId: string; targetId: string; label: string }> = [];
 
@@ -15,6 +16,7 @@ export function renderMermaid(tree: TreeNode): string {
     edgeDefs,
     styleDefs,
     counter,
+    tagKindMap,
     inGroup: false,
     linkIdMap,
     pendingCrossLinks,
@@ -40,6 +42,8 @@ interface VisitOptions {
   styleDefs: string[];
   /** Monotonically incrementing counter shared across the entire traversal. */
   counter: { n: number };
+  /** Maps tag kind to palette index, built dynamically on first occurrence. */
+  tagKindMap: Map<string, number>;
   /** True when currently inside a subgraph block. Prevents nested subgraphs. */
   inGroup: boolean;
   /** Maps meta.linkId values to Mermaid node IDs for cross-edge resolution. */
@@ -60,6 +64,7 @@ function visit({
   edgeDefs,
   styleDefs,
   counter,
+  tagKindMap,
   inGroup,
   linkIdMap,
   pendingCrossLinks,
@@ -67,7 +72,8 @@ function visit({
   propName,
 }: VisitOptions): void {
   const group = node.meta?.group as string | undefined;
-  const style = node.meta?.style as { fill: string; stroke: string } | undefined;
+  const tags = node.meta?.tags as string[] | undefined;
+  const style = resolveStyle(tags, tagKindMap);
   const openSubgraph = !!group && !inGroup && node.children.length > 0;
   const id = `n${counter.n++}`;
 
@@ -106,6 +112,7 @@ function visit({
         edgeDefs,
         styleDefs,
         counter,
+        tagKindMap,
         inGroup: true,
         linkIdMap,
         pendingCrossLinks,
@@ -122,6 +129,7 @@ function visit({
         edgeDefs,
         styleDefs,
         counter,
+        tagKindMap,
         inGroup: !!group || inGroup,
         linkIdMap,
         pendingCrossLinks,
@@ -140,6 +148,7 @@ function visit({
           edgeDefs,
           styleDefs,
           counter,
+          tagKindMap,
           inGroup: !!group || inGroup,
           linkIdMap,
           pendingCrossLinks,
@@ -149,6 +158,33 @@ function visit({
       }
     }
   }
+}
+
+const PALETTE = [
+  { fill: '#dbeafe', stroke: '#93c5fd' },
+  { fill: '#d1fae5', stroke: '#6ee7b7' },
+  { fill: '#ede9fe', stroke: '#c4b5fd' },
+  { fill: '#fef9c3', stroke: '#fde047' },
+  { fill: '#f0f9ff', stroke: '#7dd3fc' },
+  { fill: '#fed7aa', stroke: '#fb923c' },
+  { fill: '#fce7f3', stroke: '#f9a8d4' },
+  { fill: '#ccfbf1', stroke: '#5eead4' },
+] as const;
+
+/** @internal */
+function resolveStyle(
+  tags: string[] | undefined,
+  tagKindMap: Map<string, number>,
+): (typeof PALETTE)[number] | undefined {
+  const firstTag = tags?.[0];
+  if (!firstTag) {
+    return undefined;
+  }
+  const kind = tagKind(firstTag);
+  if (!tagKindMap.has(kind)) {
+    tagKindMap.set(kind, tagKindMap.size % PALETTE.length);
+  }
+  return PALETTE[tagKindMap.get(kind)!];
 }
 
 /** @internal */
@@ -174,4 +210,10 @@ function buildEdge(node: TreeNode, propName?: string): string {
     return '-->|&&|';
   }
   return '-->';
+}
+
+/** @internal */
+function tagKind(tag: string): string {
+  const colon = tag.indexOf(':');
+  return colon === -1 ? tag : tag.slice(0, colon);
 }

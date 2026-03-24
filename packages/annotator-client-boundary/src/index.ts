@@ -41,7 +41,6 @@ function annotateNode(
             ...appendTag(node.meta, 'client'),
             ...appendBadge(node.meta, '⚡'),
             group: 'client',
-            style: { fill: '#dbeafe', stroke: '#93c5fd' },
           },
         }
       : {}),

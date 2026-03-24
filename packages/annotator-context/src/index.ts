@@ -9,9 +9,6 @@ import {
 import { Node, SyntaxKind, type Project } from 'ts-morph';
 import * as path from 'node:path';
 
-const PROVIDER_STYLE = { fill: '#d1fae5', stroke: '#6ee7b7' };
-const CONSUMER_STYLE = { fill: '#ede9fe', stroke: '#c4b5fd' };
-
 export function createContextAnnotator(
   sourceFilePath: string,
   project: Project,
@@ -76,10 +73,8 @@ function annotateNode(
     return { ...node, children, ...(props ? { props } : {}) };
   }
 
-  const hasProvides = newTags.some((t) => t.startsWith('provides:'));
   const hasConsumes = newTags.some((t) => t.startsWith('consumes:'));
   const existingTags = (node.meta?.tags as string[] | undefined) ?? [];
-  const style = hasProvides ? PROVIDER_STYLE : CONSUMER_STYLE;
   const linkId = hasConsumes ? genId() : undefined;
 
   return {
@@ -88,7 +83,6 @@ function annotateNode(
       ...node.meta,
       ...appendBadge(node.meta, '◎'),
       tags: [...existingTags, ...newTags],
-      style,
       ...(linkId ? { linkId } : {}),
     },
     children,
