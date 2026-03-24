@@ -1,5 +1,16 @@
 # @makotot/canopy-cli
 
+## 0.9.0
+
+### Minor Changes
+
+- b2549d6: Add JSON reporter. `@makotot/canopy-reporter-json` is a new package that serializes the render tree as JSON. The CLI gains a `--reporter` option (e.g. `--reporter json`) to select the reporter at runtime; interactive mode also exposes this choice.
+
+### Patch Changes
+
+- Updated dependencies [b2549d6]
+  - @makotot/canopy-reporter-json@0.1.0
+
 ## 0.8.2
 
 ### Patch Changes
