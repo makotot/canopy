@@ -71,13 +71,13 @@ describe('renderMermaid', () => {
   n0 -->|&&| n1`,
     },
     {
-      label: 'meta.style applies style directive',
+      label: 'tagged node gets first palette color',
       tree: {
         component: 'Page',
         children: [
           {
             component: 'ClientWidget',
-            meta: { badge: ['⚡'], style: { fill: '#dbeafe', stroke: '#93c5fd' } },
+            meta: { badge: ['⚡'], tags: ['client'] },
             children: [],
           },
         ],
@@ -87,6 +87,67 @@ describe('renderMermaid', () => {
   n1["ClientWidget<br/>⚡"]
   n0 --> n1
   style n1 fill:#dbeafe,stroke:#93c5fd`,
+    },
+    {
+      label: 'second tagged node gets second palette color',
+      tree: {
+        component: 'Page',
+        children: [
+          {
+            component: 'ClientWidget',
+            meta: { tags: ['client'] },
+            children: [{ component: 'AsyncData', meta: { tags: ['async'] }, children: [] }],
+          },
+        ],
+      } satisfies TreeNode,
+      expected: `flowchart TD
+  n0["Page"]
+  n1["ClientWidget"]
+  n2["AsyncData"]
+  n0 --> n1
+  n1 --> n2
+  style n1 fill:#dbeafe,stroke:#93c5fd
+  style n2 fill:#d1fae5,stroke:#6ee7b7`,
+    },
+    {
+      label: 'same tag kind always gets the same palette color',
+      tree: {
+        component: 'Page',
+        children: [
+          { component: 'A', meta: { tags: ['client'] }, children: [] },
+          { component: 'B', meta: { tags: ['async'] }, children: [] },
+          { component: 'C', meta: { tags: ['client'] }, children: [] },
+        ],
+      } satisfies TreeNode,
+      expected: `flowchart TD
+  n0["Page"]
+  n1["A"]
+  n2["B"]
+  n3["C"]
+  n0 --> n1
+  n0 --> n2
+  n0 --> n3
+  style n1 fill:#dbeafe,stroke:#93c5fd
+  style n2 fill:#d1fae5,stroke:#6ee7b7
+  style n3 fill:#dbeafe,stroke:#93c5fd`,
+    },
+    {
+      label: 'colon-prefixed tags are grouped by prefix for color assignment',
+      tree: {
+        component: 'Page',
+        children: [
+          { component: 'A', meta: { tags: ['provides:Foo'] }, children: [] },
+          { component: 'B', meta: { tags: ['provides:Bar'] }, children: [] },
+        ],
+      } satisfies TreeNode,
+      expected: `flowchart TD
+  n0["Page"]
+  n1["A"]
+  n2["B"]
+  n0 --> n1
+  n0 --> n2
+  style n1 fill:#dbeafe,stroke:#93c5fd
+  style n2 fill:#dbeafe,stroke:#93c5fd`,
     },
     {
       label: 'props with JSX nodes render as labeled edges',
@@ -121,7 +182,7 @@ describe('renderMermaid', () => {
             meta: {
               badge: ['⚡'],
               group: 'client',
-              style: { fill: '#dbeafe', stroke: '#93c5fd' },
+              tags: ['client'],
             },
             children: [{ component: 'button', children: [] }],
           },
@@ -147,7 +208,7 @@ describe('renderMermaid', () => {
             meta: {
               badge: ['⚡'],
               group: 'client',
-              style: { fill: '#dbeafe', stroke: '#93c5fd' },
+              tags: ['client'],
             },
             children: [
               {
@@ -155,7 +216,7 @@ describe('renderMermaid', () => {
                 meta: {
                   badge: ['⚡'],
                   group: 'client',
-                  style: { fill: '#dbeafe', stroke: '#93c5fd' },
+                  tags: ['client'],
                 },
                 children: [{ component: 'span', children: [] }],
               },
@@ -185,7 +246,7 @@ describe('renderMermaid', () => {
             component: 'AuthProvider',
             meta: {
               badge: ['◎'],
-              style: { fill: '#d1fae5', stroke: '#6ee7b7' },
+              tags: ['provides:AuthContext'],
               crossLinks: [{ targetId: 'ctx-0', label: 'AuthContext' }],
             },
             children: [
@@ -193,7 +254,7 @@ describe('renderMermaid', () => {
                 component: 'UserMenu',
                 meta: {
                   badge: ['◎'],
-                  style: { fill: '#ede9fe', stroke: '#c4b5fd' },
+                  tags: ['consumes:AuthContext'],
                   linkId: 'ctx-0',
                 },
                 children: [],
@@ -209,8 +270,8 @@ describe('renderMermaid', () => {
   n0 --> n1
   n1 --> n2
   n1 -.->|AuthContext| n2
-  style n1 fill:#d1fae5,stroke:#6ee7b7
-  style n2 fill:#ede9fe,stroke:#c4b5fd`,
+  style n1 fill:#dbeafe,stroke:#93c5fd
+  style n2 fill:#d1fae5,stroke:#6ee7b7`,
     },
     {
       label: 'meta.crossLinks with no matching linkId emits nothing',

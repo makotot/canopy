@@ -60,16 +60,4 @@ describe('createExternalAnnotator', () => {
     const meta = annotator(tree).children[0]?.children.find((c) => c.component === 'Search')?.meta;
     expect(meta?.['badge']).toEqual(['📦 lucide-react']);
   });
-
-  it('sets meta.style on matched component', () => {
-    const { tree, sourceFilePath } = analyzeRenderTree({
-      filePath: fixture('app-with-external.tsx'),
-      project,
-    });
-    const annotator = createExternalAnnotator(sourceFilePath, project, {
-      packages: ['lucide-react'],
-    });
-    const meta = annotator(tree).children[0]?.children.find((c) => c.component === 'Search')?.meta;
-    expect(meta?.['style']).toEqual({ fill: '#f0f9ff', stroke: '#7dd3fc' });
-  });
 });

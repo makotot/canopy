@@ -82,17 +82,4 @@ describe('createClientBoundaryAnnotator', () => {
     expect(meta?.['badge']).toEqual(['⚡']);
     expect(meta?.['tags']).toEqual(['client']);
   });
-
-  it('sets meta.style with blue fill and stroke on client component', () => {
-    const { tree, sourceFilePath } = analyzeRenderTree({
-      filePath: fixture('page-with-client-and-server.tsx'),
-      project,
-    });
-    const annotator = createClientBoundaryAnnotator(sourceFilePath, project);
-    expect(tree.children[0]?.children[0]?.component).toBe('ClientWidget');
-    expect(annotator(tree).children[0]?.children[0]?.meta?.['style']).toStrictEqual({
-      fill: '#dbeafe',
-      stroke: '#93c5fd',
-    });
-  });
 });

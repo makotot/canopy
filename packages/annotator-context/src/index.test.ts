@@ -101,30 +101,6 @@ describe('createContextAnnotator', () => {
       expect(annotator(tree).children[0]?.meta?.['badge']).toEqual(['◎']);
     });
 
-    it('sets green style on provider', () => {
-      const { tree, sourceFilePath } = analyzeRenderTree({
-        filePath: fixture('page-with-direct-provider.tsx'),
-        project,
-      });
-      const annotator = createContextAnnotator(sourceFilePath, project);
-      expect(annotator(tree).children[0]?.meta?.['style']).toStrictEqual({
-        fill: '#d1fae5',
-        stroke: '#6ee7b7',
-      });
-    });
-
-    it('sets purple style on consumer', () => {
-      const { tree, sourceFilePath } = analyzeRenderTree({
-        filePath: fixture('page-with-direct-consumer.tsx'),
-        project,
-      });
-      const annotator = createContextAnnotator(sourceFilePath, project);
-      expect(annotator(tree).children[0]?.children[0]?.meta?.['style']).toStrictEqual({
-        fill: '#ede9fe',
-        stroke: '#c4b5fd',
-      });
-    });
-
     it('sets meta.linkId on consumer nodes', () => {
       const { tree, sourceFilePath } = analyzeRenderTree({
         filePath: fixture('page-with-direct-consumer.tsx'),
