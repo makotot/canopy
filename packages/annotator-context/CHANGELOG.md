@@ -1,5 +1,11 @@
 # @makotot/canopy-annotator-context
 
+## 0.3.2
+
+### Patch Changes
+
+- 3f8f128: Move visual style mapping from annotators to reporter-mermaid. Annotators now only attach semantic tags to nodes; reporter-mermaid assigns colors from a built-in palette based on traversal order, cycling through colors deterministically. This removes the coupling between annotators and Mermaid-specific style details.
+
 ## 0.3.1
 
 ### Patch Changes

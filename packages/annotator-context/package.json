@@ -1,6 +1,6 @@
 {
   "name": "@makotot/canopy-annotator-context",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Canopy annotator — detects React Context providers and consumers",
   "license": "MIT",
   "repository": {
