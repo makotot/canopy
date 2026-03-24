@@ -1,6 +1,6 @@
 {
   "name": "@makotot/canopy-annotator-external",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Canopy annotator — detects components from user-specified external packages",
   "license": "MIT",
   "repository": {
