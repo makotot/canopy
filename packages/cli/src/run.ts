@@ -1,7 +1,15 @@
 import { analyzeRenderTree, createPipeline, type Out } from '@makotot/canopy-core';
 import { createMermaidReporter } from '@makotot/canopy-reporter-mermaid';
+import { createJsonReporter } from '@makotot/canopy-reporter-json';
 import { type Project } from 'ts-morph';
 import { type AnnotatorFactory } from './annotators.js';
+
+export type ReporterFactory = (out: Out) => ReturnType<typeof createMermaidReporter>;
+
+export const reporterFactories: Record<string, ReporterFactory> = {
+  mermaid: createMermaidReporter,
+  json: createJsonReporter,
+};
 
 export function run(
   filePath: string,
@@ -9,6 +17,7 @@ export function run(
   project?: Project,
   componentName?: string,
   annotatorFactories: AnnotatorFactory[] = [],
+  reporterFactory: ReporterFactory = createMermaidReporter,
 ): void {
   const {
     tree,
@@ -22,6 +31,6 @@ export function run(
   createPipeline({
     build: () => tree,
     annotators: annotatorFactories.map((factory) => factory(sourceFilePath, resolvedProject)),
-    reporter: createMermaidReporter(out),
+    reporter: reporterFactory(out),
   });
 }

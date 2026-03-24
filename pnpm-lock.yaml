@@ -104,6 +104,9 @@ importers:
       '@makotot/canopy-core':
         specifier: workspace:*
         version: link:../core
+      '@makotot/canopy-reporter-json':
+        specifier: workspace:*
+        version: link:../reporter-json
       '@makotot/canopy-reporter-mermaid':
         specifier: workspace:*
         version: link:../reporter-mermaid
@@ -120,6 +123,12 @@ importers:
       ts-morph:
         specifier: 27.0.2
         version: 27.0.2
+
+  packages/reporter-json:
+    dependencies:
+      '@makotot/canopy-core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/reporter-mermaid:
     dependencies:

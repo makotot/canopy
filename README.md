@@ -137,6 +137,19 @@ Run without arguments to launch an interactive prompt that guides you through se
 npx @makotot/canopy-cli --interactive
 ```
 
+### Reporters
+
+By default, output is a Mermaid flowchart. Use `--reporter` to change the format:
+
+| Flag                 | Description                            |
+| -------------------- | -------------------------------------- |
+| `--reporter mermaid` | Mermaid flowchart (default)            |
+| `--reporter json`    | JSON representation of the render tree |
+
+```sh
+canopy app/page.tsx --reporter json
+```
+
 ### Options
 
 ```
@@ -144,6 +157,7 @@ npx @makotot/canopy-cli --interactive
 --component <name>          Analyze a named export instead of the default export
 --annotator <name>          Annotator to apply (repeatable)
 --external-packages <pkgs>  Comma-separated package names for the external annotator
+--reporter <name>           Reporter to use: mermaid, json (default: mermaid)
 ```
 
 ## Contributing
@@ -175,6 +189,7 @@ node packages/cli/dist/cli.js <file>
 | [`@makotot/canopy-annotator-context`](./packages/annotator-context)                 | Marks React Context providers and consumers       |
 | [`@makotot/canopy-annotator-external`](./packages/annotator-external)               | Marks components from user-specified npm packages |
 | [`@makotot/canopy-reporter-mermaid`](./packages/reporter-mermaid)                   | Renders Mermaid flowchart output                  |
+| [`@makotot/canopy-reporter-json`](./packages/reporter-json)                         | Renders JSON output                               |
 
 ## Requirements
 

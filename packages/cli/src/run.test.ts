@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { type Project } from 'ts-morph';
 import { createProject } from '@makotot/canopy-core';
 import { createAsyncAnnotator } from '@makotot/canopy-annotator-async';
+import { createJsonReporter } from '@makotot/canopy-reporter-json';
 import { run } from './run.js';
 import { buildAnnotators } from './annotators.js';
 
@@ -110,5 +111,22 @@ describe('run', () => {
     expect(() => buildAnnotators(['unknown-annotator'])).toThrow(
       'Unknown annotator: unknown-annotator',
     );
+  });
+
+  it('outputs JSON when json reporter is specified', () => {
+    let output = '';
+    run(
+      fixture('simple-page.tsx'),
+      (s) => {
+        output = s;
+      },
+      project,
+      undefined,
+      [],
+      createJsonReporter,
+    );
+    const parsed = JSON.parse(output);
+    expect(parsed).toHaveProperty('component');
+    expect(parsed).toHaveProperty('children');
   });
 });
