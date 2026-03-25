@@ -110,6 +110,9 @@ importers:
       '@makotot/canopy-reporter-mermaid':
         specifier: workspace:*
         version: link:../reporter-mermaid
+      '@makotot/canopy-reporter-tree':
+        specifier: workspace:*
+        version: link:../reporter-tree
       cac:
         specifier: 7.0.0
         version: 7.0.0
@@ -131,6 +134,12 @@ importers:
         version: link:../core
 
   packages/reporter-mermaid:
+    dependencies:
+      '@makotot/canopy-core':
+        specifier: workspace:*
+        version: link:../core
+
+  packages/reporter-tree:
     dependencies:
       '@makotot/canopy-core':
         specifier: workspace:*
