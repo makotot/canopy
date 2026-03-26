@@ -141,10 +141,11 @@ npx @makotot/canopy-cli --interactive
 
 By default, output is a Mermaid flowchart. Use `--reporter` to change the format:
 
-| Flag                 | Description                            |
-| -------------------- | -------------------------------------- |
-| `--reporter mermaid` | Mermaid flowchart (default)            |
-| `--reporter json`    | JSON representation of the render tree |
+| Flag                 | Description                                      |
+| -------------------- | ------------------------------------------------ |
+| `--reporter mermaid` | Mermaid flowchart (default)                      |
+| `--reporter json`    | JSON representation of the render tree           |
+| `--reporter tree`    | ASCII tree printed to stdout (terminal-friendly) |
 
 ```sh
 canopy app/page.tsx --reporter json
@@ -157,7 +158,7 @@ canopy app/page.tsx --reporter json
 --component <name>          Analyze a named export instead of the default export
 --annotator <name>          Annotator to apply (repeatable)
 --external-packages <pkgs>  Comma-separated package names for the external annotator
---reporter <name>           Reporter to use: mermaid, json (default: mermaid)
+--reporter <name>           Reporter to use: mermaid, json, tree (default: mermaid)
 ```
 
 ## Contributing
@@ -190,6 +191,7 @@ node packages/cli/dist/cli.js <file>
 | [`@makotot/canopy-annotator-external`](./packages/annotator-external)               | Marks components from user-specified npm packages |
 | [`@makotot/canopy-reporter-mermaid`](./packages/reporter-mermaid)                   | Renders Mermaid flowchart output                  |
 | [`@makotot/canopy-reporter-json`](./packages/reporter-json)                         | Renders JSON output                               |
+| [`@makotot/canopy-reporter-tree`](./packages/reporter-tree)                         | Renders ASCII tree output                         |
 
 ## Requirements
 

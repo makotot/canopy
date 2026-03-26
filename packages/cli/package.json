@@ -32,6 +32,7 @@
     "@makotot/canopy-core": "workspace:*",
     "@makotot/canopy-reporter-json": "workspace:*",
     "@makotot/canopy-reporter-mermaid": "workspace:*",
+    "@makotot/canopy-reporter-tree": "workspace:*",
     "cac": "7.0.0"
   },
   "devDependencies": {

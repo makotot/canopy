@@ -28,6 +28,9 @@ export default defineConfig({
       '@makotot/canopy-reporter-json': fileURLToPath(
         new URL('./packages/reporter-json/src/index.ts', import.meta.url),
       ),
+      '@makotot/canopy-reporter-tree': fileURLToPath(
+        new URL('./packages/reporter-tree/src/index.ts', import.meta.url),
+      ),
     },
   },
   test: {
