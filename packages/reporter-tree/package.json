@@ -1,6 +1,6 @@
 {
   "name": "@makotot/canopy-reporter-tree",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Canopy reporter — renders render trees as ASCII tree",
   "license": "MIT",
   "repository": {
